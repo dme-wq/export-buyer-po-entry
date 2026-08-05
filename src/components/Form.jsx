@@ -285,7 +285,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
       <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
         <button type="submit" className="btn btn-primary" onClick={() => {if(formData.poNumber) toast.success("PO Ready to Submit!");}}>
-          <Send className="btn-icon" size={18} /> Submit to FMS
+          <Send className="btn-icon" size={18} /> Submit
         </button>
       </div>
       
