@@ -131,32 +131,42 @@ export default function Form({ authenticatedEmail, onLogout }) {
         background: bg,
         borderColor: border,
         borderRadius: '12px',
-        padding: '0.2rem',
+        padding: '0',
+        minHeight: '42px',
+        fontSize: '0.9rem',
         boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
         cursor: 'pointer',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
       };
     },
+    valueContainer: (provided) => ({
+      ...provided,
+      padding: '0 12px',
+    }),
     singleValue: (provided) => ({
       ...provided,
       color: isMismatch ? 'white' : 'var(--text-heading)',
       fontWeight: 600,
+      fontSize: '0.9rem',
     }),
     placeholder: (provided, state) => ({
       ...provided,
       color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.6)' : 'var(--input-placeholder)'),
+      fontSize: '0.85rem',
     }),
     menu: (provided) => ({
       ...provided,
       borderRadius: '12px',
       overflow: 'hidden',
       zIndex: 100,
+      fontSize: '0.9rem',
     }),
     option: (provided, state) => ({
       ...provided,
       backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fef08a' : 'white'),
       color: state.isSelected ? 'white' : 'black',
       cursor: 'pointer',
+      padding: '10px 14px',
     }),
   });
 

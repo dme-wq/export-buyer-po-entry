@@ -80,7 +80,7 @@ body::after {
 
 .container {
   width: 100%;
-  max-width: 500px; /* strict mobile width */
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -269,7 +269,13 @@ select.form-input option {
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem 0.75rem; /* Slightly tighter gap horizontally for mobile */
+  gap: 1.25rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
+  }
 }
 
 .full-width {
