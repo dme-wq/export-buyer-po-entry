@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, Camera, File, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { UploadCloud, Camera, File, Image as ImageIcon, Loader2, ExternalLink } from 'lucide-react';
 
 export default function FileUpload({ onFileSelect, file, isExtracting }) {
   const [dragActive, setDragActive] = useState(false);
@@ -79,25 +79,32 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
           </button>
         </div>
         
-        {preview ? (
-          <div className="file-preview" style={{ width: '100%', height: '400px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-            {file.type === 'application/pdf' ? (
-              <iframe 
-                src={`${preview}#toolbar=0`} 
-                title="PDF Preview"
-                width="100%" 
-                height="100%" 
-                style={{ border: 'none' }}
-              />
-            ) : (
-              <img src={preview} alt="Document Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            )}
-          </div>
-        ) : (
-          <div className="file-preview" style={{ padding: '3rem', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-            <File size={48} color="var(--text-secondary)" />
-            <p>Preview not available for this file type.</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Please verify extracted data below.</p>
+        {preview && (
+          <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+            <a 
+              href={preview} 
+              target="_blank" 
+              rel="noreferrer"
+              style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                padding: '0.75rem 1.5rem', 
+                background: 'rgba(79, 70, 229, 0.1)', 
+                color: 'var(--accent-color)', 
+                borderRadius: '50px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                border: '1px solid rgba(79, 70, 229, 0.2)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(79, 70, 229, 0.2)' }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(79, 70, 229, 0.1)' }}
+            >
+              <ExternalLink size={16} />
+              View Uploaded Document
+            </a>
           </div>
         )}
       </div>
