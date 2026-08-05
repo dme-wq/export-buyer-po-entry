@@ -25,6 +25,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
   const [file, setFile] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Update timestamp every second
@@ -101,12 +102,48 @@ export default function Form({ authenticatedEmail, onLogout }) {
     };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting Form Data:', formData);
-    console.log('Attached File:', file);
-    // In a real app, this would be a fetch POST to Google Apps Script endpoint
-    setIsSubmitted(true);
+    
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    if (!scriptUrl) {
+      toast.error("Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // In a real application, you would also upload the `file` to Google Drive or another storage
+    // and pass the URL into formData.poLink. Since we only have the script for data, we'll pass the name.
+    const payload = {
+      ...formData,
+      poLink: file ? file.name : ''
+    };
+
+    try {
+      const response = await fetch(scriptUrl, {
+        method: 'POST',
+        // 'no-cors' is often needed for simple Apps Script POSTs from browsers, 
+        // but 'cors' is better if doOptions is configured correctly.
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      if (result.status === 'success') {
+        toast.success("PO Submitted to FMS Successfully!");
+        setIsSubmitted(true);
+      } else {
+        throw new Error(result.message || "Failed to submit");
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      toast.error("Failed to save to Google Sheets. Please check configuration.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -287,8 +324,12 @@ export default function Form({ authenticatedEmail, onLogout }) {
       </div>
 
       <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <button type="submit" className="btn btn-primary" onClick={() => {if(formData.poNumber) toast.success("PO Ready to Submit!");}}>
-          <Send className="btn-icon" size={18} /> Submit
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? (
+             <><Loader2 className="btn-icon animate-spin" size={18} /> Submitting...</>
+          ) : (
+             <><Send className="btn-icon" size={18} /> Submit</>
+          )}
         </button>
       </div>
       
