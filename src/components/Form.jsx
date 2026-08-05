@@ -102,6 +102,15 @@ export default function Form({ authenticatedEmail, onLogout }) {
     };
   };
 
+  const getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]); // Only get the base64 part
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -113,11 +122,25 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
     setIsSubmitting(true);
     
-    // In a real application, you would also upload the `file` to Google Drive or another storage
-    // and pass the URL into formData.poLink. Since we only have the script for data, we'll pass the name.
+    let fileBase64 = '';
+    let fileName = '';
+    let mimeType = '';
+    
+    if (file) {
+      try {
+        fileBase64 = await getBase64(file);
+        fileName = file.name;
+        mimeType = file.type;
+      } catch (err) {
+        console.error("Error reading file:", err);
+      }
+    }
+
     const payload = {
       ...formData,
-      poLink: file ? file.name : ''
+      fileContent: fileBase64,
+      fileName: fileName,
+      mimeType: mimeType
     };
 
     try {

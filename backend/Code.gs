@@ -69,6 +69,22 @@ function doPost(e) {
     // ColJ: PO Link (File URL if uploaded to Drive, for now taking URL or filename)
     // ColK: Onboard Vessel Date
     
+    let poLink = data.poLink || '';
+    
+    // Handle File Upload to Google Drive
+    if (data.fileContent) {
+      try {
+        const folder = DriveApp.getFolderById('1rXerF7ZuTreU2FGUvsaT555PTmksrzRHyIib9TuIMwXquZNzfOhv-HmVb6ZJuB4J7nHExW8V');
+        const blob = Utilities.newBlob(Utilities.base64Decode(data.fileContent), data.mimeType || 'application/pdf', data.fileName || 'Uploaded_PO');
+        const newFile = folder.createFile(blob);
+        newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        poLink = newFile.getUrl();
+      } catch (e) {
+        console.error("Error uploading file to Drive: " + e.toString());
+        poLink = 'Error uploading: ' + data.fileName;
+      }
+    }
+    
     const newRow = [
       data.timestamp || new Date(),
       data.email || '',
@@ -79,7 +95,7 @@ function doPost(e) {
       data.retailerCountry || '',
       data.exFactoryDate || '',
       data.deliveryAddress || '',
-      data.poLink || '',
+      poLink,
       data.onboardVesselDate || ''
     ];
     
