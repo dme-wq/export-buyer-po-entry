@@ -152,7 +152,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
-      <h3 style={{ marginTop: '2rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h3 style={{ marginTop: '2rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
         <FileText size={20} color="var(--accent-color)" /> PO Details
       </h3>
 
@@ -217,7 +217,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
       </div>
 
-      <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
         <Box size={20} color="var(--accent-color)" /> Retailer & Shipping
       </h3>
 
