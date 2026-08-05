@@ -78,6 +78,12 @@ body::after {
   min-height: 100vh;
 }
 
+@media (max-width: 600px) {
+  #root {
+    padding: 1rem 0.5rem; /* Reduce root padding on mobile */
+  }
+}
+
 .container {
   width: 100%;
   max-width: 900px;
@@ -109,6 +115,12 @@ body::after {
   position: relative;
   width: 100%;
   z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .glass-panel {
+    padding: 1.5rem 0.75rem; /* Reduce panel padding on mobile */
+  }
 }
 
 /* Typography */
