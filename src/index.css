@@ -200,16 +200,30 @@ p {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* When a field is blank (invalid due to required) */
-.form-input:required:invalid {
-  background-color: darkred;
-  color: white;
-  border-color: darkred;
+/* Pre-extraction blank state */
+.pre-extraction .form-input:required:invalid {
+  background-color: #fef08a; /* Light yellow */
+  border-color: #fde047;
+  color: #000;
+}
+.pre-extraction .form-input:required:invalid::placeholder {
+  color: rgba(0, 0, 0, 0.6);
 }
 
-/* Adjust placeholder for dark red background */
-.form-input:required:invalid::placeholder {
-  color: rgba(255, 255, 255, 0.8);
+/* Post-extraction blank state */
+.post-extraction .form-input:required:invalid {
+  background-color: #fca5a5; /* Light red */
+  border-color: #f87171;
+  color: #000;
+}
+.post-extraction .form-input:required:invalid::placeholder {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Edit state (focus) */
+.form-input:focus {
+  background-color: #fef08a !important; /* Light yellow when typing/focused */
+  border-color: #facc15 !important;
 }
 
 .form-input::placeholder {

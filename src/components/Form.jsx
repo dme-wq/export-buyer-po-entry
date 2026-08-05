@@ -26,6 +26,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
   const [file, setFile] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [hasExtracted, setHasExtracted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -103,25 +104,47 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }
   };
 
-  const customSelectStyles = (isInvalid) => ({
-    control: (provided, state) => ({
-      ...provided,
-      background: isInvalid ? 'darkred' : (state.isFocused ? '#ffffff' : '#f8fafc'),
-      borderColor: isInvalid ? 'darkred' : (state.isFocused ? 'var(--accent-color)' : '#cbd5e1'),
-      borderRadius: '12px',
-      padding: '0.2rem',
-      boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
-      cursor: 'pointer',
-      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
-    }),
+  const customSelectStyles = (isMismatch, isEmpty, hasExtractedValue) => ({
+    control: (provided, state) => {
+      let bg = state.isFocused ? '#fef08a' : '#f8fafc';
+      let border = state.isFocused ? '#facc15' : '#cbd5e1';
+      let textCol = 'var(--text-heading)';
+      let phCol = 'var(--input-placeholder)';
+      
+      if (isMismatch) {
+        bg = 'darkred';
+        border = 'darkred';
+        textCol = 'white';
+        phCol = 'rgba(255,255,255,0.8)';
+      } else if (isEmpty && !state.isFocused) {
+        if (hasExtractedValue) {
+          bg = '#fca5a5';
+          border = '#f87171';
+        } else {
+          bg = '#fef08a';
+          border = '#fde047';
+        }
+      }
+      
+      return {
+        ...provided,
+        background: bg,
+        borderColor: border,
+        borderRadius: '12px',
+        padding: '0.2rem',
+        boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
+        cursor: 'pointer',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+      };
+    },
     singleValue: (provided) => ({
       ...provided,
-      color: isInvalid ? 'white' : 'var(--text-heading)',
+      color: isMismatch ? 'white' : 'var(--text-heading)',
       fontWeight: 600,
     }),
-    placeholder: (provided) => ({
+    placeholder: (provided, state) => ({
       ...provided,
-      color: isInvalid ? 'rgba(255, 255, 255, 0.8)' : 'var(--input-placeholder)',
+      color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.6)' : 'var(--input-placeholder)'),
     }),
     menu: (provided) => ({
       ...provided,
@@ -131,7 +154,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#f1f5f9' : 'white'),
+      backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fef08a' : 'white'),
       color: state.isSelected ? 'white' : 'black',
       cursor: 'pointer',
     }),
@@ -179,6 +202,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
           retailerCountry: data.retailerCountry || prev.retailerCountry
         }));
 
+        setHasExtracted(true);
         toast.success("PO Data extracted successfully!");
       } catch (error) {
         console.error("OCR API error:", error);
@@ -271,6 +295,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
           className="btn btn-primary mt-6"
           onClick={() => {
             setIsSubmitted(false);
+            setHasExtracted(false);
             setFile(null);
             setFormData(prev => ({
               ...prev,
@@ -289,7 +314,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
     <>
     <Toaster position="top-center" reverseOrder={false} />
     
-    <form onSubmit={handleSubmit} className="animate-slide-up delay-2">
+    <form onSubmit={handleSubmit} className={`animate-slide-up delay-2 ${hasExtracted ? 'post-extraction' : 'pre-extraction'}`}>
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
@@ -315,7 +340,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
               handleChange({ target: { name: 'buyerName', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.buyers.map(b => ({ value: b.buyerName, label: b.buyerName }))}
-            styles={customSelectStyles(isBuyerNameInvalid)}
+            styles={customSelectStyles(isBuyerNameInvalid, !formData.buyerName, hasExtracted)}
             placeholder="Search Buyer Name..."
             isClearable
             isSearchable
@@ -414,7 +439,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
               handleChange({ target: { name: 'retailerName', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.retailers.map(r => ({ value: r, label: r }))}
-            styles={customSelectStyles(false)}
+            styles={customSelectStyles(false, !formData.retailerName, hasExtracted)}
             placeholder="Search Retailer..."
             isClearable
             isSearchable
@@ -433,7 +458,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
               handleChange({ target: { name: 'retailerCountry', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.countries.map(c => ({ value: c, label: c }))}
-            styles={customSelectStyles(false)}
+            styles={customSelectStyles(false, !formData.retailerCountry, hasExtracted)}
             placeholder="Search Country..."
             isClearable
             isSearchable
