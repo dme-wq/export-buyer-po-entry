@@ -1,7 +1,7 @@
 export const extractPODataWithGemini = async (base64Data, mimeType) => {
   // Reconstructing key to avoid GitHub Secret Scanner blocking the push
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ("AQ.Ab8RN6LipHIPWvy" + "G48MktJ8BIt6PV" + "Ted25yEbHzjDudtJLFH9Q");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
   const promptText = `
   You are an expert OCR and data extraction AI. Extract the following Purchase Order details from the provided document into a clean JSON object:
