@@ -13,6 +13,7 @@ export const extractPODataWithGemini = async (base64Data, mimeType) => {
   - retailerCountry (string)
   - exFactoryDate (string, format YYYY-MM-DD)
   - onboardVesselDate (string, format YYYY-MM-DD)
+  - poAmount (string, the total order value or amount)
   
   Return ONLY a valid JSON object matching these keys. If a field is not found, leave it as an empty string "". Do not include markdown tags like \`\`\`json.
   `;

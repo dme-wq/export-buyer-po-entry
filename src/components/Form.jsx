@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box } from 'lucide-react';
+import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
 
-const mockDropdownData = {
-  retailers: ['Dot Com', 'JC Penny', 'TJX', '1888 Mills', 'Homegoods', 'Warehouse', 'HalfPrice'],
-  countries: ['United States', 'Ukraine', 'Italy', 'Germany', 'Australia']
-};
-
 export default function Form({ authenticatedEmail, onLogout }) {
+  const [dropdownData, setDropdownData] = useState({ retailers: [], countries: [], buyers: [] });
+  const [isBuyerNameInvalid, setIsBuyerNameInvalid] = useState(false);
+  const [fileNumber, setFileNumber] = useState('');
+
   const [formData, setFormData] = useState({
     timestamp: '',
     email: authenticatedEmail || '',
     buyerName: '',
     poDate: '',
     poNumber: '',
+    poAmount: '',
     retailerName: '',
     retailerCountry: '',
     exFactoryDate: '',
@@ -27,6 +27,28 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const [isExtracting, setIsExtracting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Fetch dynamic dropdowns
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      if (!scriptUrl) return;
+      try {
+        const response = await fetch(scriptUrl);
+        const result = await response.json();
+        if (result.status === 'success') {
+          setDropdownData({
+             retailers: result.data.retailers || [],
+             countries: result.data.countries || [],
+             buyers: result.data.buyers || []
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching dropdowns:", err);
+      }
+    };
+    fetchDropdowns();
+  }, []);
 
   // Update timestamp every second
   useEffect(() => {
@@ -51,9 +73,33 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }
   }, [authenticatedEmail]);
 
+  // Append Short Name to PO Number and populate Virtual Column
+  useEffect(() => {
+    if (formData.buyerName && dropdownData.buyers.length > 0) {
+      const matchedBuyer = dropdownData.buyers.find(b => b.buyerName === formData.buyerName);
+      if (matchedBuyer) {
+        setFileNumber(matchedBuyer.fileNumber);
+        
+        // Append short name to poNumber if both exist
+        if (formData.poNumber && matchedBuyer.shortName) {
+           const suffix = '_' + matchedBuyer.shortName;
+           if (!formData.poNumber.endsWith(suffix)) {
+             setFormData(prev => ({ ...prev, poNumber: prev.poNumber + suffix }));
+           }
+        }
+      } else {
+        setFileNumber('');
+      }
+    }
+  }, [formData.buyerName, formData.poNumber, dropdownData.buyers]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'buyerName') {
+      setIsBuyerNameInvalid(false);
+    }
   };
 
   const handleFileUpload = (uploadedFile) => {
@@ -75,11 +121,22 @@ export default function Form({ authenticatedEmail, onLogout }) {
       try {
         const data = await extractPODataWithGemini(base64String, mimeType);
         
+        const extractedBuyer = data.buyerName || '';
+        let invalidBuyer = false;
+        
+        if (extractedBuyer && dropdownData.buyers.length > 0) {
+          if (!dropdownData.buyers.some(b => b.buyerName === extractedBuyer)) {
+            invalidBuyer = true;
+          }
+        }
+        setIsBuyerNameInvalid(invalidBuyer);
+
         setFormData(prev => ({
           ...prev,
-          buyerName: data.buyerName || prev.buyerName,
+          buyerName: extractedBuyer || prev.buyerName,
           poDate: data.poDate || prev.poDate,
           poNumber: data.poNumber || prev.poNumber,
+          poAmount: data.poAmount || prev.poAmount,
           exFactoryDate: data.exFactoryDate || prev.exFactoryDate,
           deliveryAddress: data.deliveryAddress || prev.deliveryAddress,
           onboardVesselDate: data.onboardVesselDate || prev.onboardVesselDate,
@@ -182,7 +239,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             setFile(null);
             setFormData(prev => ({
               ...prev,
-              buyerName: '', poDate: '', poNumber: '', retailerName: '',
+              buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '',
               retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: ''
             }));
           }}
@@ -217,18 +274,39 @@ export default function Form({ authenticatedEmail, onLogout }) {
       </h3>
 
       <div className="form-grid">
-        <div className="form-group full-width">
+        <div className="form-group">
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <User size={14} color="var(--accent-color)"/> Buyer Name
           </label>
-          <input 
-            type="text" 
+          <select 
             name="buyerName" 
             className="form-input" 
             value={formData.buyerName} 
-            onChange={handleChange} 
-            placeholder="Auto-extracted or manual entry"
+            onChange={handleChange}
+            style={isBuyerNameInvalid ? { backgroundColor: 'darkred', color: 'white', borderColor: 'darkred' } : {}}
             required
+          >
+            <option value="" disabled>Select Buyer Name</option>
+            {dropdownData.buyers.map(b => (
+               <option key={b.buyerName} value={b.buyerName}>{b.buyerName}</option>
+            ))}
+            {isBuyerNameInvalid && formData.buyerName && (
+               <option value={formData.buyerName} disabled>{formData.buyerName} (Not in list)</option>
+            )}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <FileText size={14} color="var(--accent-color)"/> File Number (Virtual)
+          </label>
+          <input 
+            type="text" 
+            className="form-input" 
+            value={fileNumber} 
+            placeholder="Auto-populated"
+            readOnly
+            style={{ backgroundColor: '#e2e8f0', cursor: 'default' }}
           />
         </div>
 
@@ -258,6 +336,21 @@ export default function Form({ authenticatedEmail, onLogout }) {
             value={formData.poNumber} 
             onChange={handleChange} 
             placeholder="Auto-extracted or manual entry"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <DollarSign size={14} color="var(--accent-color)"/> PO Amount
+          </label>
+          <input 
+            type="text" 
+            name="poAmount" 
+            className="form-input" 
+            value={formData.poAmount} 
+            onChange={handleChange} 
+            placeholder="Total Amount"
             required
           />
         </div>
@@ -295,7 +388,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             required
           >
             <option value="" disabled>Select a retailer</option>
-            {mockDropdownData.retailers.map(r => <option key={r} value={r}>{r}</option>)}
+            {dropdownData.retailers.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
 
@@ -311,7 +404,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             required
           >
             <option value="" disabled>Select a country</option>
-            {mockDropdownData.countries.map(c => <option key={c} value={c}>{c}</option>)}
+            {dropdownData.countries.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
 

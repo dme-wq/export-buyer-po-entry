@@ -29,15 +29,29 @@ function doGet(e) {
     const retailerCountriesRange = dropDownSheet.getRange('F2:F' + dropDownSheet.getLastRow());
     const retailerCountries = retailerCountriesRange.getValues().flat().filter(String);
     
-    // Remove duplicates
+    // Remove duplicates for retailers
     const uniqueNames = [...new Set(retailerNames)];
     const uniqueCountries = [...new Set(retailerCountries)];
+    
+    // Get Buyer Data from 'Buyer Name' tab
+    const buyerSheet = ss.getSheetByName('Buyer Name');
+    let buyers = [];
+    if (buyerSheet) {
+      const buyerDataRange = buyerSheet.getRange('A2:O' + buyerSheet.getLastRow());
+      const buyerData = buyerDataRange.getValues();
+      buyers = buyerData.map(row => ({
+        fileNumber: row[1] || '',      // Column B
+        buyerName: row[6] || '',       // Column G
+        shortName: row[14] || ''       // Column O
+      })).filter(b => b.buyerName !== '');
+    }
     
     return ContentService.createTextOutput(JSON.stringify({
       status: 'success',
       data: {
         retailers: uniqueNames,
-        countries: uniqueCountries
+        countries: uniqueCountries,
+        buyers: buyers
       }
     })).setMimeType(ContentService.MimeType.JSON);
     
@@ -68,6 +82,7 @@ function doPost(e) {
     // ColI: Delivery Address
     // ColJ: PO Link (File URL if uploaded to Drive, for now taking URL or filename)
     // ColK: Onboard Vessel Date
+    // ColL: PO Amount
     
     let poLink = data.poLink || '';
     
@@ -96,7 +111,8 @@ function doPost(e) {
       data.exFactoryDate || '',
       data.deliveryAddress || '',
       poLink,
-      data.onboardVesselDate || ''
+      data.onboardVesselDate || '',
+      data.poAmount || ''
     ];
     
     responsesSheet.appendRow(newRow);
