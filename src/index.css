@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
   --bg-color: #ffffff; 
@@ -103,6 +103,7 @@ h1, h2, h3, h4 {
 }
 
 h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 1.6rem; /* Reduced from 2.25rem */
   text-align: center; /* Centered */
   letter-spacing: -0.5px;
@@ -121,6 +122,7 @@ h1 {
 }
 
 .app-header p {
+  font-family: 'Bricolage Grotesque', sans-serif;
   color: var(--text-secondary);
   text-align: center; /* Centered */
   font-size: 0.9rem; /* Reduced */
