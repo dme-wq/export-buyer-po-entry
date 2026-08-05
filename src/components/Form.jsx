@@ -182,6 +182,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={formData.poDate} 
             onChange={handleChange} 
+            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
@@ -264,6 +265,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={formData.exFactoryDate} 
             onChange={handleChange} 
+            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
@@ -278,6 +280,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={formData.onboardVesselDate} 
             onChange={handleChange} 
+            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
