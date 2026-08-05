@@ -3,6 +3,7 @@ import Form from './components/Form';
 import { Package, Lock, Clock, CheckCircle } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import PwaPrompt from './components/PwaPrompt';
 
 function App() {
   const [userEmail, setUserEmail] = useState(null);
@@ -119,6 +120,8 @@ function App() {
           </div>
         </div>
       </main>
+      
+      <PwaPrompt />
     </>
   );
 }
