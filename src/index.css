@@ -1,20 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
-  --bg-color: #6b63f6; /* Soft purple background */
-  --bg-gradient: linear-gradient(135deg, #6b63f6 0%, #8b5cf6 100%);
-  --card-bg: #ffffff;
-  
-  --text-primary: #374151; /* Dark gray for text */
+  --bg-color: #ffffff; 
+  --text-primary: #111827;
   --text-secondary: #6b7280;
-  --text-heading: #4338ca; /* Dark purple/blue for headings */
+  --text-heading: #111827; 
   
-  --input-bg: #f3f6f9;
-  --input-color: #374151;
+  --input-bg: #f3f4f6;
+  --input-color: #111827;
   --input-placeholder: #9ca3af;
   
   --accent-color: #7b71f9;
   --accent-hover: #6054f0;
+  
+  --btn-bg: #2d3748; /* Dark slate for submit button */
+  --btn-hover: #1a202c;
   
   --success-color: #10b981;
   --error-color: #ef4444;
@@ -27,28 +27,38 @@
 }
 
 body {
-  font-family: 'Nunito', sans-serif; /* A softer, rounder font matches this UI */
-  background: var(--bg-gradient);
-  background-attachment: fixed;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-color);
   color: var(--text-primary);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
 }
 
-/* Wavy background decoration */
+/* Decorative Blobs mimicking the new template */
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  top: -150px;
+  right: -100px;
+  width: 350px;
+  height: 350px;
+  background: var(--accent-color);
+  border-radius: 50%;
   z-index: -1;
-  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -150px;
+  left: -100px;
+  width: 300px;
+  height: 300px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.9;
 }
 
 #root {
@@ -56,66 +66,55 @@ body::before {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 1.5rem 1rem;
+  padding: 2.5rem 1.5rem;
+  min-height: 100vh;
 }
 
 .container {
   width: 100%;
-  max-width: 600px; /* Kept narrow for mobile-first feel */
+  max-width: 500px; /* strict mobile width */
   margin: 0 auto;
 }
 
-/* Main Form Card */
+/* Main Form Card - Now completely flat and transparent, blending with the white body */
 .glass-panel {
-  background: var(--card-bg);
-  border-radius: 32px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  padding: 2rem 1.5rem;
-  position: relative;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem 0;
   border: none;
-  backdrop-filter: none;
-}
-
-/* Decorative side blobs to mimic the image */
-.glass-panel::before, .glass-panel::after {
-  content: '';
-  position: absolute;
-  background: var(--card-bg);
-  border-radius: 9999px;
-  z-index: -1;
-}
-
-.glass-panel::before {
-  width: 40px;
-  height: 20px;
-  top: 40px;
-  left: -15px;
-}
-
-.glass-panel::after {
-  width: 50px;
-  height: 25px;
-  bottom: 40px;
-  right: -20px;
+  position: relative;
+  width: 100%;
 }
 
 /* Typography */
 h1, h2, h3, h4 {
   font-weight: 800;
   color: var(--text-heading);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 h1 {
-  font-size: 2rem;
-  text-align: center;
-  color: #ffffff; /* Header text white to contrast with purple bg */
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 2.25rem;
+  text-align: left;
+  letter-spacing: -0.5px;
+}
+
+.app-header {
+  text-align: left;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+  z-index: 10;
+  position: relative;
 }
 
 .app-header p {
-  color: rgba(255, 255, 255, 0.9);
-  text-align: center;
+  color: var(--text-secondary);
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
 }
 
 h3 {
@@ -124,7 +123,7 @@ h3 {
 
 p {
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Form Elements */
@@ -138,22 +137,23 @@ p {
 .form-label {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
-  margin-left: 0.75rem; /* Indent slightly to align with pill input text */
+  margin-left: 0.25rem; 
 }
 
 .form-input {
   background: var(--input-bg);
   border: 2px solid transparent;
-  border-radius: 9999px; /* Pill shape */
-  padding: 0.875rem 1.25rem;
+  border-radius: 12px; /* Soft rounded rectangle */
+  padding: 1rem 1.25rem;
   color: var(--input-color);
   font-size: 1rem;
   font-family: inherit;
   font-weight: 600;
   outline: none;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .form-input::placeholder {
@@ -172,10 +172,10 @@ p {
   cursor: not-allowed;
 }
 
-/* Custom styling for Select to match pill shape */
+/* Custom styling for Select */
 select.form-input {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1.25rem center;
   background-size: 1em;
@@ -194,26 +194,24 @@ select.form-input {
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  border-radius: 9999px; /* Pill shape */
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
   outline: none;
   width: 100%;
+  margin-top: 1rem;
 }
 
 .btn-primary {
-  background: var(--accent-color);
+  background: var(--btn-bg);
   color: white;
-  box-shadow: 0 6px 15px rgba(123, 113, 249, 0.3);
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(123, 113, 249, 0.4);
+  background: var(--btn-hover);
 }
 
 .btn-primary:active {
@@ -227,12 +225,12 @@ select.form-input {
 /* File Upload Zone */
 .upload-zone {
   border: 2px dashed #d1d5db;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 2rem 1.5rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #f9fafb;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -242,7 +240,7 @@ select.form-input {
 
 .upload-zone:hover, .upload-zone.drag-active {
   border-color: var(--accent-color);
-  background: #f3f6f9;
+  background: #f8fafc;
 }
 
 .upload-icon {
@@ -265,7 +263,7 @@ select.form-input {
 .file-preview {
   margin-top: 1rem;
   width: 100%;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   border: 2px solid #e5e7eb;
 }
@@ -290,24 +288,11 @@ select.form-input {
 
 .delay-1 { animation-delay: 0.1s; }
 .delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-.delay-4 { animation-delay: 0.4s; }
 
-/* Header */
-.app-header {
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
+/* Overriding App Logo styles */
 .app-logo {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: #ffffff;
-  border-radius: 16px;
+  justify-content: flex-start;
   margin-bottom: 1rem;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  color: var(--accent-color);
 }

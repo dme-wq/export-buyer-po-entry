@@ -40,8 +40,12 @@ function App() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', textAlign: 'center' }}>
         <div className="glass-panel animate-slide-up" style={{ maxWidth: '400px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 2rem' }}>
-          <div className="app-logo" style={{ marginBottom: '1.5rem' }}>
-            <Lock color="var(--accent-color)" size={28} />
+          <div className="app-logo" style={{ marginBottom: '1.5rem', justifyContent: 'center' }}>
+            <img 
+              src="https://static.wixstatic.com/media/68b92a_d71e34133826499983234774dea1945b~mv2.png/v1/fill/w_186,h_156,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/RKD-Logo.png" 
+              alt="RKD Logo" 
+              style={{ height: '64px', width: 'auto', objectFit: 'contain' }}
+            />
           </div>
           <h1 style={{ color: 'var(--text-heading)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Secure Access</h1>
           <p style={{ marginBottom: '2rem', fontSize: '0.875rem' }}>Please sign in with your Google account to access the PO Entry WebForm.</p>
@@ -64,11 +68,11 @@ function App() {
   return (
     <>
       <header className="app-header animate-slide-up">
-        <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '1rem', background: '#ffffff', borderRadius: '16px', padding: '0.5rem', boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)' }}>
+        <div className="app-logo">
           <img 
             src="https://static.wixstatic.com/media/68b92a_d71e34133826499983234774dea1945b~mv2.png/v1/fill/w_186,h_156,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/RKD-Logo.png" 
             alt="RKD Logo" 
-            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+            style={{ height: '64px', width: 'auto', objectFit: 'contain' }}
           />
         </div>
         <h1>RKD Furnishings Pvt. Ltd.</h1>
