@@ -7,10 +7,10 @@ const mockDropdownData = {
   countries: ['United States', 'Ukraine', 'Italy', 'Germany', 'Australia']
 };
 
-export default function Form() {
+export default function Form({ authenticatedEmail, onLogout }) {
   const [formData, setFormData] = useState({
     timestamp: '',
-    email: '',
+    email: authenticatedEmail || '',
     buyerName: '',
     poDate: '',
     poNumber: '',
@@ -41,11 +41,12 @@ export default function Form() {
     return () => clearInterval(interval);
   }, []);
 
-  // Mock initial Google Auth
+  // Update form data if authenticatedEmail changes (failsafe)
   useEffect(() => {
-    // Simulating Google Login fetching email
-    setFormData(prev => ({ ...prev, email: 'user@example.com' }));
-  }, []);
+    if (authenticatedEmail) {
+      setFormData(prev => ({ ...prev, email: authenticatedEmail }));
+    }
+  }, [authenticatedEmail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -149,13 +150,22 @@ export default function Form() {
     <form onSubmit={handleSubmit} className="animate-slide-up delay-2">
       
       <div className="form-group">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', padding: '0.75rem 1rem', borderRadius: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
             <Clock size={18} />
             <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{formData.timestamp}</span>
           </div>
-          <div style={{ fontSize: '0.875rem', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <CheckCircle size={14} /> Logged in as: {formData.email}
+          <div style={{ fontSize: '0.875rem', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <CheckCircle size={14} /> {formData.email}
+            </span>
+            <button 
+              type="button" 
+              onClick={onLogout}
+              style={{ background: 'none', border: 'none', color: 'var(--error-color)', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.75rem', fontWeight: 600 }}
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>
