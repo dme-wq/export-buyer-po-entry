@@ -9,6 +9,8 @@ import CreatableSelect from 'react-select/creatable';
 export default function Form({ authenticatedEmail, onLogout }) {
   const [dropdownData, setDropdownData] = useState({ retailers: [], countries: [], buyers: [] });
   const [isBuyerNameInvalid, setIsBuyerNameInvalid] = useState(false);
+  const [isRetailerNameInvalid, setIsRetailerNameInvalid] = useState(false);
+  const [isRetailerCountryInvalid, setIsRetailerCountryInvalid] = useState(false);
   const [fileNumber, setFileNumber] = useState('');
 
   const [formData, setFormData] = useState({
@@ -113,6 +115,12 @@ export default function Form({ authenticatedEmail, onLogout }) {
     if (name === 'buyerName') {
       setIsBuyerNameInvalid(false);
     }
+    if (name === 'retailerName') {
+      setIsRetailerNameInvalid(false);
+    }
+    if (name === 'retailerCountry') {
+      setIsRetailerCountryInvalid(false);
+    }
   };
 
   const customSelectStyles = (isMismatch, isEmpty, hasExtractedValue) => ({
@@ -209,6 +217,24 @@ export default function Form({ authenticatedEmail, onLogout }) {
           }
         }
         setIsBuyerNameInvalid(invalidBuyer);
+
+        const extractedRetailer = data.retailerName || '';
+        let invalidRetailer = false;
+        if (extractedRetailer && dropdownData.retailers.length > 0) {
+          if (!dropdownData.retailers.includes(extractedRetailer)) {
+            invalidRetailer = true;
+          }
+        }
+        setIsRetailerNameInvalid(invalidRetailer);
+
+        const extractedCountry = data.retailerCountry || '';
+        let invalidCountry = false;
+        if (extractedCountry && dropdownData.countries.length > 0) {
+          if (!dropdownData.countries.includes(extractedCountry)) {
+            invalidCountry = true;
+          }
+        }
+        setIsRetailerCountryInvalid(invalidCountry);
 
         setFormData(prev => ({
           ...prev,
@@ -460,7 +486,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
               handleChange({ target: { name: 'retailerName', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.retailers.map(r => ({ value: r, label: r }))}
-            styles={customSelectStyles(false, !formData.retailerName, hasExtracted)}
+            styles={customSelectStyles(isRetailerNameInvalid, !formData.retailerName, hasExtracted)}
             placeholder="Search or Add New..."
             formatCreateLabel={(inputValue) => `Add new retailer "${inputValue}"`}
             isClearable
@@ -480,7 +506,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
               handleChange({ target: { name: 'retailerCountry', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.countries.map(c => ({ value: c, label: c }))}
-            styles={customSelectStyles(false, !formData.retailerCountry, hasExtracted)}
+            styles={customSelectStyles(isRetailerCountryInvalid, !formData.retailerCountry, hasExtracted)}
             placeholder="Search or Add New..."
             formatCreateLabel={(inputValue) => `Add new country "${inputValue}"`}
             isClearable
