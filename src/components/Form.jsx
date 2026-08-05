@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, CheckCircle, Search, Send, Clock, FileText } from 'lucide-react';
+import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box } from 'lucide-react';
 import FileUpload from './FileUpload';
 
 const mockDropdownData = {
@@ -149,36 +149,28 @@ export default function Form({ authenticatedEmail, onLogout }) {
   return (
     <form onSubmit={handleSubmit} className="animate-slide-up delay-2">
       
-      <div className="form-group">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', padding: '0.75rem 1rem', borderRadius: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-            <Clock size={18} />
-            <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{formData.timestamp}</span>
-          </div>
-          <div style={{ fontSize: '0.875rem', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <CheckCircle size={14} /> {formData.email}
-            </span>
-            <button 
-              type="button" 
-              onClick={onLogout}
-              style={{ background: 'none', border: 'none', color: 'var(--error-color)', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.75rem', fontWeight: 600 }}
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
+      {/* Compact Top Right Profile Badge */}
+      <div style={{ position: 'fixed', top: '12px', right: '12px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', fontSize: '0.7rem' }}>
+         <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+           <Clock size={12} /> {formData.timestamp}
+         </div>
+         <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success-color)', fontWeight: 600 }}>
+             <CheckCircle size={12} /> {formData.email} 
+             <button type="button" onClick={onLogout} style={{color: 'var(--error-color)', border: 'none', background: 'none', marginLeft: '6px', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px'}}>Sign Out</button>
+         </div>
       </div>
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
-      <h3 style={{ marginTop: '2rem', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h3 style={{ marginTop: '2rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <FileText size={20} color="var(--accent-color)" /> PO Details
       </h3>
 
       <div className="form-grid">
-        <div className="form-group">
-          <label className="form-label">Buyer Name</label>
+        <div className="form-group full-width">
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <User size={14} color="var(--accent-color)"/> Buyer Name
+          </label>
           <input 
             type="text" 
             name="buyerName" 
@@ -191,7 +183,9 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">PO Date</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Calendar size={14} color="var(--accent-color)"/> PO Date
+          </label>
           <input 
             type="date" 
             name="poDate" 
@@ -203,7 +197,9 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Buyer PO Number</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <FileDigit size={14} color="var(--accent-color)"/> Buyer PO Number
+          </label>
           <input 
             type="text" 
             name="poNumber" 
@@ -215,8 +211,10 @@ export default function Form({ authenticatedEmail, onLogout }) {
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Delivery Address</label>
+        <div className="form-group full-width">
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <MapPin size={14} color="var(--accent-color)"/> Delivery Address
+          </label>
           <input 
             type="text" 
             name="deliveryAddress" 
@@ -229,11 +227,15 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
       </div>
 
-      <h3 style={{ marginTop: '1.5rem', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Retailer & Shipping</h3>
+      <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Box size={20} color="var(--accent-color)" /> Retailer & Shipping
+      </h3>
 
       <div className="form-grid">
         <div className="form-group">
-          <label className="form-label">Retailer Name</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Building size={14} color="var(--accent-color)"/> Retailer Name
+          </label>
           <select 
             name="retailerName" 
             className="form-input" 
@@ -247,7 +249,9 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Retailer Country</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Globe size={14} color="var(--accent-color)"/> Retailer Country
+          </label>
           <select 
             name="retailerCountry" 
             className="form-input" 
@@ -261,7 +265,9 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Ex-Factory Date</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Truck size={14} color="var(--accent-color)"/> Ex-Factory Date
+          </label>
           <input 
             type="date" 
             name="exFactoryDate" 
@@ -273,7 +279,9 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Onboard Vessel Date</label>
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Ship size={14} color="var(--accent-color)"/> Onboard Vessel Date
+          </label>
           <input 
             type="date" 
             name="onboardVesselDate" 
