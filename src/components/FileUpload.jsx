@@ -36,14 +36,14 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
 
   const processFile = (selectedFile) => {
     // Generate preview
-    if (selectedFile.type.startsWith('image/')) {
+    if (selectedFile.type.startsWith('image/') || selectedFile.type === 'application/pdf') {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(selectedFile);
     } else {
-      setPreview(null); // non-image, handled below
+      setPreview(null); // non-image/pdf, handled below
     }
     
     onFileSelect(selectedFile);
@@ -80,8 +80,18 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
         </div>
         
         {preview ? (
-          <div className="file-preview">
-            <img src={preview} alt="Document Preview" />
+          <div className="file-preview" style={{ width: '100%', height: '400px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+            {file.type === 'application/pdf' ? (
+              <iframe 
+                src={`${preview}#toolbar=0`} 
+                title="PDF Preview"
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none' }}
+              />
+            ) : (
+              <img src={preview} alt="Document Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            )}
           </div>
         ) : (
           <div className="file-preview" style={{ padding: '3rem', background: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
