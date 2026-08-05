@@ -286,7 +286,13 @@ select.form-input option {
 
 @media (max-width: 768px) {
   .form-grid {
-    gap: 1.25rem 0.5rem; /* Maintain 2 columns but with a tighter horizontal gap */
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 1.25rem;
+  }
+  
+  .form-input {
+    font-size: 1rem; /* Increase font size on mobile */
+    padding: 1rem;
   }
 }
 

@@ -151,8 +151,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
         borderColor: border,
         borderRadius: '12px',
         padding: '0',
-        minHeight: '42px',
-        fontSize: '0.9rem',
+        minHeight: '46px', // Slightly taller for mobile tap target
+        fontSize: '1rem',
         boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
         cursor: 'pointer',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -166,26 +166,26 @@ export default function Form({ authenticatedEmail, onLogout }) {
       ...provided,
       color: isMismatch ? 'white' : 'var(--text-heading)',
       fontWeight: 600,
-      fontSize: '0.9rem',
+      fontSize: '1rem',
     }),
     placeholder: (provided, state) => ({
       ...provided,
       color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.6)' : 'var(--input-placeholder)'),
-      fontSize: '0.85rem',
+      fontSize: '0.95rem',
     }),
     menu: (provided) => ({
       ...provided,
       borderRadius: '12px',
       overflow: 'hidden',
       zIndex: 100,
-      fontSize: '0.9rem',
+      fontSize: '1rem',
     }),
     option: (provided, state) => ({
       ...provided,
       backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fef08a' : 'white'),
       color: state.isSelected ? 'white' : 'black',
       cursor: 'pointer',
-      padding: '10px 14px',
+      padding: '12px 14px', // Taller options for tapping
     }),
   });
 
