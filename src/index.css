@@ -84,15 +84,31 @@ body::after {
   margin: 0 auto;
 }
 
-/* Main Form Card - Now completely flat and transparent, blending with the white body */
-.glass-panel {
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 1rem 0;
-  border: none;
+.animated-border-wrapper {
   position: relative;
   width: 100%;
+  padding: 4px;
+  border-radius: 20px;
+  background: linear-gradient(45deg, #FF3366, #FF9933, #33CCFF, #9933FF, #FF3366);
+  background-size: 300% 300%;
+  animation: swingColors 6s ease-in-out infinite;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+@keyframes swingColors {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Main Form Card - Now inside animated wrapper */
+.glass-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  position: relative;
+  width: 100%;
+  z-index: 1;
 }
 
 /* Typography */
@@ -110,24 +126,32 @@ h1 {
 }
 
 .app-header {
-  text-align: center; /* Centered */
   width: 100%;
-  max-width: 500px;
-  margin-bottom: 1.5rem; /* Slightly reduced margin */
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
   z-index: 10;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
 }
 
 .app-header p {
   font-family: 'Bricolage Grotesque', sans-serif;
-  color: var(--text-heading); /* Darker since it's the only text now */
-  text-align: center; /* Centered */
-  font-size: 1.25rem; /* Larger font size */
+  color: var(--text-heading);
+  text-align: left;
+  font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin: 0;
 }
 
 h3 {

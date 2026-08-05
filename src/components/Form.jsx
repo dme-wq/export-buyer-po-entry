@@ -254,17 +254,6 @@ export default function Form({ authenticatedEmail, onLogout }) {
     <>
     <Toaster position="top-center" reverseOrder={false} />
     
-    {/* Compact Top Right Profile Badge */}
-    <div style={{ position: 'fixed', top: '12px', right: '12px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', fontSize: '0.7rem' }}>
-        <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-          <Clock size={12} /> {formData.timestamp}
-        </div>
-        <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success-color)', fontWeight: 600 }}>
-            <CheckCircle size={12} /> {formData.email} 
-            <button type="button" onClick={onLogout} style={{color: 'var(--error-color)', border: 'none', background: 'none', marginLeft: '6px', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px'}}>Sign Out</button>
-        </div>
-    </div>
-
     <form onSubmit={handleSubmit} className="animate-slide-up delay-2">
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
