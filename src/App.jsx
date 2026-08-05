@@ -75,7 +75,6 @@ function App() {
             style={{ height: '64px', width: 'auto', objectFit: 'contain' }}
           />
         </div>
-        <h1>RKD Furnishings Pvt. Ltd.</h1>
         <p>Export Buyer Purchase Order Entry</p>
       </header>
       

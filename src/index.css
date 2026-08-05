@@ -123,10 +123,10 @@ h1 {
 
 .app-header p {
   font-family: 'Bricolage Grotesque', sans-serif;
-  color: var(--text-secondary);
+  color: var(--text-heading); /* Darker since it's the only text now */
   text-align: center; /* Centered */
-  font-size: 0.9rem; /* Reduced */
-  font-weight: 600;
+  font-size: 1.25rem; /* Larger font size */
+  font-weight: 700;
   margin-bottom: 1.5rem;
 }
 
