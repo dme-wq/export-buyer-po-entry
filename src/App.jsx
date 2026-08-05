@@ -64,11 +64,15 @@ function App() {
   return (
     <>
       <header className="app-header animate-slide-up">
-        <div className="app-logo">
-          <Package color="var(--accent-color)" size={24} />
+        <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '1rem', background: '#ffffff', borderRadius: '16px', padding: '0.5rem', boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)' }}>
+          <img 
+            src="https://static.wixstatic.com/media/68b92a_d71e34133826499983234774dea1945b~mv2.png/v1/fill/w_186,h_156,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/RKD-Logo.png" 
+            alt="RKD Logo" 
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+          />
         </div>
-        <h1>Order to Dispatch</h1>
-        <p>Premium WebForm for Buyer PO Entry</p>
+        <h1>RKD Furnishings Pvt. Ltd.</h1>
+        <p>Export Buyer Purchase Order Entry</p>
       </header>
       
       <main className="container animate-slide-up delay-1">
