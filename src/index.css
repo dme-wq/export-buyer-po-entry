@@ -86,7 +86,7 @@ body::after {
 
 .container {
   width: 100%;
-  max-width: 900px;
+  max-width: 500px; /* Reverted back to strict width for desktop */
   margin: 0 auto;
 }
 
