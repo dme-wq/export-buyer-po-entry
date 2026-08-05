@@ -21,12 +21,15 @@ function doGet(e) {
     const ss = SpreadsheetApp.openById(SHEET_ID);
     const dropDownSheet = ss.getSheetByName(DROPDOWNS_TAB);
     
+    // Prevent error if sheet has fewer than 2 rows
+    const lrDrop = Math.max(dropDownSheet.getLastRow(), 2);
+    
     // Get Retailer Names (Column G)
-    const retailerNamesRange = dropDownSheet.getRange('G2:G' + dropDownSheet.getLastRow());
+    const retailerNamesRange = dropDownSheet.getRange('G2:G' + lrDrop);
     const retailerNames = retailerNamesRange.getValues().flat().filter(String);
     
     // Get Retailer Countries (Column F)
-    const retailerCountriesRange = dropDownSheet.getRange('F2:F' + dropDownSheet.getLastRow());
+    const retailerCountriesRange = dropDownSheet.getRange('F2:F' + lrDrop);
     const retailerCountries = retailerCountriesRange.getValues().flat().filter(String);
     
     // Remove duplicates for retailers
@@ -37,7 +40,8 @@ function doGet(e) {
     const buyerSheet = ss.getSheetByName('Buyer Name');
     let buyers = [];
     if (buyerSheet) {
-      const buyerDataRange = buyerSheet.getRange('A2:O' + buyerSheet.getLastRow());
+      const lrBuyer = Math.max(buyerSheet.getLastRow(), 2);
+      const buyerDataRange = buyerSheet.getRange('A2:O' + lrBuyer);
       const buyerData = buyerDataRange.getValues();
       buyers = buyerData.map(row => ({
         fileNumber: row[1] || '',      // Column B

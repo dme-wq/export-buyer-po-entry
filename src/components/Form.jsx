@@ -3,6 +3,7 @@ import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar
 import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
+import Select from 'react-select';
 
 export default function Form({ authenticatedEmail, onLogout }) {
   const [dropdownData, setDropdownData] = useState({ retailers: [], countries: [], buyers: [] });
@@ -101,6 +102,40 @@ export default function Form({ authenticatedEmail, onLogout }) {
       setIsBuyerNameInvalid(false);
     }
   };
+
+  const customSelectStyles = (isInvalid) => ({
+    control: (provided, state) => ({
+      ...provided,
+      background: isInvalid ? 'darkred' : (state.isFocused ? '#ffffff' : '#f8fafc'),
+      borderColor: isInvalid ? 'darkred' : (state.isFocused ? 'var(--accent-color)' : '#cbd5e1'),
+      borderRadius: '12px',
+      padding: '0.2rem',
+      boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
+      cursor: 'pointer',
+      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: isInvalid ? 'white' : 'var(--text-heading)',
+      fontWeight: 600,
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: isInvalid ? 'rgba(255, 255, 255, 0.8)' : 'var(--input-placeholder)',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: '12px',
+      overflow: 'hidden',
+      zIndex: 100,
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#f1f5f9' : 'white'),
+      color: state.isSelected ? 'white' : 'black',
+      cursor: 'pointer',
+    }),
+  });
 
   const handleFileUpload = (uploadedFile) => {
     setFile(uploadedFile);
@@ -267,22 +302,25 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <User size={14} color="var(--accent-color)"/> Buyer Name
           </label>
-          <select 
-            name="buyerName" 
-            className="form-input" 
-            value={formData.buyerName} 
-            onChange={handleChange}
-            style={isBuyerNameInvalid ? { backgroundColor: 'darkred', color: 'white', borderColor: 'darkred' } : {}}
+          <Select
+            name="buyerName"
+            value={
+              formData.buyerName 
+                ? (dropdownData.buyers.some(b => b.buyerName === formData.buyerName)
+                    ? { value: formData.buyerName, label: formData.buyerName }
+                    : { value: formData.buyerName, label: `${formData.buyerName} (Not in list)` })
+                : null
+            }
+            onChange={(selectedOption) => {
+              handleChange({ target: { name: 'buyerName', value: selectedOption ? selectedOption.value : '' } });
+            }}
+            options={dropdownData.buyers.map(b => ({ value: b.buyerName, label: b.buyerName }))}
+            styles={customSelectStyles(isBuyerNameInvalid)}
+            placeholder="Search Buyer Name..."
+            isClearable
+            isSearchable
             required
-          >
-            <option value="" disabled>Select Buyer Name</option>
-            {dropdownData.buyers.map(b => (
-               <option key={b.buyerName} value={b.buyerName}>{b.buyerName}</option>
-            ))}
-            {isBuyerNameInvalid && formData.buyerName && (
-               <option value={formData.buyerName} disabled>{formData.buyerName} (Not in list)</option>
-            )}
-          </select>
+          />
         </div>
 
         <div className="form-group">
@@ -369,32 +407,38 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Building size={14} color="var(--accent-color)"/> Retailer Name
           </label>
-          <select 
-            name="retailerName" 
-            className="form-input" 
-            value={formData.retailerName} 
-            onChange={handleChange}
+          <Select
+            name="retailerName"
+            value={formData.retailerName ? { value: formData.retailerName, label: formData.retailerName } : null}
+            onChange={(selectedOption) => {
+              handleChange({ target: { name: 'retailerName', value: selectedOption ? selectedOption.value : '' } });
+            }}
+            options={dropdownData.retailers.map(r => ({ value: r, label: r }))}
+            styles={customSelectStyles(false)}
+            placeholder="Search Retailer..."
+            isClearable
+            isSearchable
             required
-          >
-            <option value="" disabled>Select a retailer</option>
-            {dropdownData.retailers.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+          />
         </div>
 
         <div className="form-group">
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Globe size={14} color="var(--accent-color)"/> Retailer Country
           </label>
-          <select 
-            name="retailerCountry" 
-            className="form-input" 
-            value={formData.retailerCountry} 
-            onChange={handleChange}
+          <Select
+            name="retailerCountry"
+            value={formData.retailerCountry ? { value: formData.retailerCountry, label: formData.retailerCountry } : null}
+            onChange={(selectedOption) => {
+              handleChange({ target: { name: 'retailerCountry', value: selectedOption ? selectedOption.value : '' } });
+            }}
+            options={dropdownData.countries.map(c => ({ value: c, label: c }))}
+            styles={customSelectStyles(false)}
+            placeholder="Search Country..."
+            isClearable
+            isSearchable
             required
-          >
-            <option value="" disabled>Select a country</option>
-            {dropdownData.countries.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          />
         </div>
 
         <div className="form-group">
