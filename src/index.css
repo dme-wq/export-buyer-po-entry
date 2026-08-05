@@ -28,11 +28,19 @@
 
 body {
   font-family: 'Nunito', sans-serif;
-  background: var(--bg-color);
+  background: linear-gradient(120deg, #ffffff 0%, #f1f5f9 50%, #ffffff 100%);
+  background-size: 200% 200%;
+  animation: gradientFlow 10s ease infinite;
   color: var(--text-primary);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Decorative Blobs mimicking the new template */
@@ -66,7 +74,7 @@ body::after {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 2.5rem 1.5rem;
+  padding: 2rem 1.5rem;
   min-height: 100vh;
 }
 
@@ -95,35 +103,39 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-  font-size: 2.25rem;
-  text-align: left;
+  font-size: 1.6rem; /* Reduced from 2.25rem */
+  text-align: center; /* Centered */
   letter-spacing: -0.5px;
 }
 
 .app-header {
-  text-align: left;
+  text-align: center; /* Centered */
   width: 100%;
   max-width: 500px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem; /* Slightly reduced margin */
   z-index: 10;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .app-header p {
   color: var(--text-secondary);
-  text-align: left;
-  font-size: 1rem;
+  text-align: center; /* Centered */
+  font-size: 0.9rem; /* Reduced */
   font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
 h3 {
-  font-size: 1.25rem;
+  font-size: 1.1rem; /* Reduced */
 }
 
 p {
   color: var(--text-secondary);
   line-height: 1.5;
+  font-size: 0.9rem; /* Reduced */
 }
 
 /* Form Elements */
@@ -135,25 +147,27 @@ p {
 }
 
 .form-label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
-  margin-left: 0.25rem;
+  margin-left: 0.5rem;
   transition: color 0.3s ease;
+  justify-content: center; /* Center the icon and text */
 }
 
 .form-input {
-  background: var(--input-bg);
-  border: 2px solid transparent;
+  background: #f8fafc; /* Elegant light slate background */
+  border: 1.5px solid #cbd5e1; /* Visible elegant border */
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  color: var(--input-color);
-  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  color: var(--text-heading);
+  font-size: 0.9rem; /* Reduced */
   font-family: inherit;
   font-weight: 600;
   outline: none;
   width: 100%;
+  text-align: center; /* Aligning text inside fields */
   
   /* Hardware acceleration for ultra-smooth transitions */
   transform: translateZ(0);
@@ -164,6 +178,7 @@ p {
   color: var(--input-placeholder);
   font-weight: 500;
   transition: opacity 0.3s ease;
+  text-align: center;
 }
 
 .form-input:focus {
@@ -339,6 +354,6 @@ select.form-input {
 .app-logo {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center; /* Center aligned */
   margin-bottom: 1rem;
 }

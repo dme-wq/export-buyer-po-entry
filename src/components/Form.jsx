@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box } from 'lucide-react';
 import FileUpload from './FileUpload';
+import { Toaster, toast } from 'react-hot-toast';
+import { extractPODataWithGemini } from '../utils/gemini';
 
 const mockDropdownData = {
   retailers: ['Dot Com', 'JC Penny', 'TJX', '1888 Mills', 'Homegoods', 'Warehouse', 'HalfPrice'],
@@ -70,25 +72,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
       const mimeType = uploadedFile.type;
 
       try {
-        const response = await fetch('/api/ocr', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            fileData: base64String,
-            mimeType: mimeType
-          })
-        });
-
-        if (!response.ok) {
-          console.error("Failed to extract data");
-          alert("OCR Extraction failed. Please fill manually.");
-          setIsExtracting(false);
-          return;
-        }
-
-        const data = await response.json();
+        const data = await extractPODataWithGemini(base64String, mimeType);
         
         setFormData(prev => ({
           ...prev,
@@ -97,12 +81,15 @@ export default function Form({ authenticatedEmail, onLogout }) {
           poNumber: data.poNumber || prev.poNumber,
           exFactoryDate: data.exFactoryDate || prev.exFactoryDate,
           deliveryAddress: data.deliveryAddress || prev.deliveryAddress,
-          onboardVesselDate: data.onboardVesselDate || prev.onboardVesselDate
+          onboardVesselDate: data.onboardVesselDate || prev.onboardVesselDate,
+          retailerName: data.retailerName || prev.retailerName,
+          retailerCountry: data.retailerCountry || prev.retailerCountry
         }));
 
+        toast.success("PO Data extracted successfully!");
       } catch (error) {
         console.error("OCR API error:", error);
-        alert("OCR API Error. Please fill manually.");
+        toast.error("Extraction failed. Please fill manually.");
       } finally {
         setIsExtracting(false);
       }
@@ -147,18 +134,21 @@ export default function Form({ authenticatedEmail, onLogout }) {
   }
 
   return (
+    <>
+    <Toaster position="top-center" reverseOrder={false} />
+    
+    {/* Compact Top Right Profile Badge */}
+    <div style={{ position: 'fixed', top: '12px', right: '12px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', fontSize: '0.7rem' }}>
+        <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+          <Clock size={12} /> {formData.timestamp}
+        </div>
+        <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success-color)', fontWeight: 600 }}>
+            <CheckCircle size={12} /> {formData.email} 
+            <button type="button" onClick={onLogout} style={{color: 'var(--error-color)', border: 'none', background: 'none', marginLeft: '6px', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px'}}>Sign Out</button>
+        </div>
+    </div>
+
     <form onSubmit={handleSubmit} className="animate-slide-up delay-2">
-      
-      {/* Compact Top Right Profile Badge */}
-      <div style={{ position: 'fixed', top: '12px', right: '12px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', fontSize: '0.7rem' }}>
-         <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-           <Clock size={12} /> {formData.timestamp}
-         </div>
-         <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success-color)', fontWeight: 600 }}>
-             <CheckCircle size={12} /> {formData.email} 
-             <button type="button" onClick={onLogout} style={{color: 'var(--error-color)', border: 'none', background: 'none', marginLeft: '6px', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px'}}>Sign Out</button>
-         </div>
-      </div>
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
@@ -294,11 +284,12 @@ export default function Form({ authenticatedEmail, onLogout }) {
       </div>
 
       <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" onClick={() => {if(formData.poNumber) toast.success("PO Ready to Submit!");}}>
           <Send className="btn-icon" size={18} /> Submit to FMS
         </button>
       </div>
       
     </form>
+    </>
   );
 }
