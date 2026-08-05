@@ -176,6 +176,18 @@ p {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* When a field is blank (invalid due to required) */
+.form-input:required:invalid {
+  background-color: darkred;
+  color: white;
+  border-color: darkred;
+}
+
+/* Adjust placeholder for dark red background */
+.form-input:required:invalid::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .form-input::placeholder {
   color: var(--input-placeholder);
   font-weight: 500;
@@ -184,7 +196,8 @@ p {
 }
 
 .form-input:focus {
-  background: #ffffff;
+  background-color: lightyellow !important;
+  color: black !important;
   border-color: var(--accent-color);
   box-shadow: 0 4px 16px rgba(123, 113, 249, 0.15);
   transform: translateY(-2px);
@@ -208,6 +221,11 @@ select.form-input {
   background-size: 1.2em;
   padding-right: 3rem;
   cursor: pointer;
+}
+
+select.form-input option {
+  background-color: white;
+  color: black;
 }
 
 .form-grid {
