@@ -121,6 +121,25 @@ function doPost(e) {
     
     responsesSheet.appendRow(newRow);
     
+    // Auto-append new Retailer Name to Drop Downs (Col G)
+    const dropDownSheet = ss.getSheetByName(DROPDOWNS_TAB);
+    if (dropDownSheet) {
+      if (data.retailerName) {
+        const colG = dropDownSheet.getRange('G:G').getValues().flat().filter(String);
+        if (colG.length > 0 && !colG.slice(1).includes(data.retailerName)) {
+          dropDownSheet.getRange(colG.length + 1, 7).setValue(data.retailerName);
+        }
+      }
+      
+      // Auto-append new Retailer Country to Drop Downs (Col F)
+      if (data.retailerCountry) {
+        const colF = dropDownSheet.getRange('F:F').getValues().flat().filter(String);
+        if (colF.length > 0 && !colF.slice(1).includes(data.retailerCountry)) {
+          dropDownSheet.getRange(colF.length + 1, 6).setValue(data.retailerCountry);
+        }
+      }
+    }
+    
     return ContentService.createTextOutput(JSON.stringify({
       status: 'success',
       message: 'Data saved successfully'

@@ -4,6 +4,7 @@ import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
 import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 export default function Form({ authenticatedEmail, onLogout }) {
   const [dropdownData, setDropdownData] = useState({ retailers: [], countries: [], buyers: [] });
@@ -30,23 +31,33 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Fetch dynamic dropdowns
+  // Fetch dynamic dropdowns with localStorage caching for instant loading
   useEffect(() => {
     const fetchDropdowns = async () => {
+      // 1. Instantly load from cache if available
+      const cached = localStorage.getItem('dropdownsCache');
+      if (cached) {
+        setDropdownData(JSON.parse(cached));
+      }
+
       const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
       if (!scriptUrl) return;
+      
+      // 2. Fetch fresh data in the background
       try {
         const response = await fetch(scriptUrl);
         const result = await response.json();
         if (result.status === 'success') {
-          setDropdownData({
+          const freshData = {
              retailers: result.data.retailers || [],
              countries: result.data.countries || [],
              buyers: result.data.buyers || []
-          });
+          };
+          setDropdownData(freshData);
+          localStorage.setItem('dropdownsCache', JSON.stringify(freshData));
         }
       } catch (err) {
-        console.error("Error fetching dropdowns:", err);
+        console.error("Error fetching dropdowns in background:", err);
       }
     };
     fetchDropdowns();
@@ -442,7 +453,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Building size={14} color="var(--accent-color)"/> Retailer Name
           </label>
-          <Select
+          <CreatableSelect
             name="retailerName"
             value={formData.retailerName ? { value: formData.retailerName, label: formData.retailerName } : null}
             onChange={(selectedOption) => {
@@ -450,7 +461,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
             }}
             options={dropdownData.retailers.map(r => ({ value: r, label: r }))}
             styles={customSelectStyles(false, !formData.retailerName, hasExtracted)}
-            placeholder="Search Retailer..."
+            placeholder="Search or Add New..."
+            formatCreateLabel={(inputValue) => `Add new retailer "${inputValue}"`}
             isClearable
             isSearchable
             required
@@ -461,7 +473,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Globe size={14} color="var(--accent-color)"/> Retailer Country
           </label>
-          <Select
+          <CreatableSelect
             name="retailerCountry"
             value={formData.retailerCountry ? { value: formData.retailerCountry, label: formData.retailerCountry } : null}
             onChange={(selectedOption) => {
@@ -469,7 +481,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
             }}
             options={dropdownData.countries.map(c => ({ value: c, label: c }))}
             styles={customSelectStyles(false, !formData.retailerCountry, hasExtracted)}
-            placeholder="Search Country..."
+            placeholder="Search or Add New..."
+            formatCreateLabel={(inputValue) => `Add new country "${inputValue}"`}
             isClearable
             isSearchable
             required
