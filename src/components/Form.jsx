@@ -482,7 +482,20 @@ export default function Form({ authenticatedEmail, onLogout }) {
     
     {mode === 'list' ? (
       <div className="animate-slide-up" style={{ padding: '1rem 0' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--text-heading)' }}>My Submitted POs</h2>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <h2 style={{ 
+            fontSize: '1.8rem', 
+            fontWeight: '800', 
+            background: 'linear-gradient(90deg, var(--accent-color), #33CCFF)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.5px',
+            marginBottom: '0.5rem'
+          }}>
+            RKD Export Purchase Order Entries
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0 }}>Select a previously submitted PO to view or edit</p>
+        </div>
         
         {isLoadingPOs ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
