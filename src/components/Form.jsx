@@ -135,13 +135,13 @@ export default function Form({ authenticatedEmail, onLogout }) {
         border = 'darkred';
         textCol = 'white';
         phCol = 'rgba(255,255,255,0.8)';
-      } else if (isEmpty && !state.isFocused) {
+      } else if (isInvalid && !state.isFocused) {
         if (hasExtractedValue) {
           bg = '#fca5a5';
           border = '#f87171';
         } else {
-          bg = '#fef08a';
-          border = '#fde047';
+          bg = '#fefce8';
+          border = '#fef08a';
         }
       }
       
@@ -149,10 +149,10 @@ export default function Form({ authenticatedEmail, onLogout }) {
         ...provided,
         background: bg,
         borderColor: border,
-        borderRadius: '12px',
+        borderRadius: '10px',
         padding: '0',
-        minHeight: '40px', // Slightly taller for mobile tap target
-        fontSize: '1.1rem',
+        minHeight: '36px',
+        fontSize: '1rem',
         boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
         cursor: 'pointer',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -166,26 +166,26 @@ export default function Form({ authenticatedEmail, onLogout }) {
       ...provided,
       color: isMismatch ? 'white' : 'var(--text-heading)',
       fontWeight: 600,
-      fontSize: '1.1rem',
+      fontSize: '1rem',
     }),
     placeholder: (provided, state) => ({
       ...provided,
-      color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.6)' : 'var(--input-placeholder)'),
-      fontSize: '1.05rem',
+      color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.5)' : 'var(--input-placeholder)'),
+      fontSize: '1rem',
     }),
     menu: (provided) => ({
       ...provided,
-      borderRadius: '12px',
+      borderRadius: '10px',
       overflow: 'hidden',
       zIndex: 100,
-      fontSize: '1.1rem',
+      fontSize: '1rem',
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fef08a' : 'white'),
+      backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fefce8' : 'white'),
       color: state.isSelected ? 'white' : 'black',
       cursor: 'pointer',
-      padding: '8px 12px', // Taller options for tapping
+      padding: '6px 12px', 
     }),
   });
 

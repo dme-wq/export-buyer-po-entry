@@ -194,10 +194,10 @@ p {
 .form-input {
   background: #f8fafc; /* Elegant light slate background */
   border: 1.5px solid #cbd5e1; /* Visible elegant border */
-  border-radius: 12px;
-  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  padding: 0.45rem 0.6rem;
   color: var(--text-heading);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-family: inherit;
   font-weight: 600;
   outline: none;
@@ -211,12 +211,12 @@ p {
 
 /* Pre-extraction blank state */
 .pre-extraction .form-input:required:invalid {
-  background-color: #fef08a; /* Light yellow */
-  border-color: #fde047;
+  background-color: #fefce8; /* Very pale yellow */
+  border-color: #fef08a;
   color: #000;
 }
 .pre-extraction .form-input:required:invalid::placeholder {
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.5);
 }
 
 /* Post-extraction blank state */
@@ -229,12 +229,6 @@ p {
   color: rgba(0, 0, 0, 0.7);
 }
 
-/* Edit state (focus) */
-.form-input:focus {
-  background-color: #fef08a !important; /* Light yellow when typing/focused */
-  border-color: #facc15 !important;
-}
-
 .form-input::placeholder {
   color: var(--input-placeholder);
   font-weight: 500;
@@ -242,10 +236,11 @@ p {
   text-align: center;
 }
 
+/* Edit state (focus) */
 .form-input:focus {
-  background-color: lightyellow !important;
+  background-color: #fefce8 !important; /* Very pale yellow when focused */
   color: black !important;
-  border-color: var(--accent-color);
+  border-color: var(--accent-color) !important;
   box-shadow: 0 4px 16px rgba(123, 113, 249, 0.15);
   transform: translateY(-2px);
 }
