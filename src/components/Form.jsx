@@ -7,16 +7,35 @@ import { extractPODataWithGemini } from '../utils/gemini';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-const CustomDateInput = ({ name, value, onChange, required, className }) => {
-  const [isFocused, setIsFocused] = useState(false);
-  
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const [year, month, day] = dateStr.split('-');
-    if (!year || !month || !day) return dateStr;
+const displayFormatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    const [year, month, day] = parts;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${day}-${months[parseInt(month, 10) - 1]}-${year}`;
-  };
+  }
+  return dateStr;
+};
+
+const displayFormatTimestamp = (timestampStr) => {
+  if (!timestampStr) return '';
+  const d = new Date(timestampStr);
+  if (isNaN(d.getTime())) return timestampStr;
+  
+  const day = String(d.getDate()).padStart(2, '0');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
+const CustomDateInput = ({ name, value, onChange, required, className }) => {
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -24,7 +43,7 @@ const CustomDateInput = ({ name, value, onChange, required, className }) => {
         type={isFocused || !value ? 'date' : 'text'}
         name={name}
         className={className}
-        value={isFocused || !value ? value : formatDate(value)}
+        value={isFocused || !value ? value : displayFormatDate(value)}
         onChange={onChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -61,7 +80,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
     retailerCountry: '',
     exFactoryDate: '',
     deliveryAddress: '',
-    onboardVesselDate: ''
+    onboardVesselDate: '',
+    poLink: ''
   });
 
   const [file, setFile] = useState(null);
@@ -420,7 +440,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         <CheckCircle color="var(--success-color)" size={72} style={{ marginBottom: '1rem' }} />
         <h2 style={{ fontSize: '1.8rem', color: 'var(--text-heading)', marginBottom: '0.5rem' }}>Form Submitted Successfully!</h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem' }}>Your PO data has been recorded in the FMS.</p>
-        <button 
+          <button 
           className="btn btn-primary"
           style={{ padding: '0.8rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', width: 'auto' }}
           onClick={() => {
@@ -431,7 +451,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             setFormData(prev => ({
               ...prev,
               buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '',
-              retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: ''
+              retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '', poLink: ''
             }));
           }}
         >
@@ -440,6 +460,32 @@ export default function Form({ authenticatedEmail, onLogout }) {
       </div>
     );
   }
+
+  const renderAttachment = (link) => {
+    if (!link || typeof link !== 'string') return null;
+    
+    // Check if it's an error message from Apps Script
+    if (link.startsWith('Error uploading')) {
+      return <div style={{ color: 'var(--error-color)', padding: '1rem', background: '#fee2e2', borderRadius: '8px', border: '1px solid #fca5a5' }}>{link}</div>;
+    }
+    
+    // If it doesn't start with http, it's not a valid URL (prevent it from loading the React app as a relative URL)
+    if (!link.startsWith('http')) {
+      return <div style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Invalid attachment link.</div>;
+    }
+
+    // Convert Google Drive view link to preview link for correct iframe embedding
+    let embedLink = link;
+    if (link.includes('drive.google.com/file/d/')) {
+      embedLink = link.replace(/\/view.*$/, '/preview');
+    }
+
+    if (link.match(/\.(jpeg|jpg|gif|png)$/i)) {
+      return <img src={link} alt="PO Document" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} />;
+    }
+
+    return <iframe src={embedLink} style={{ width: '100%', height: '400px', border: 'none', background: '#f8fafc' }} title="PO Document" />;
+  };
 
   return (
     <>
@@ -452,7 +498,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         onClick={() => {
           if (mode === 'list') {
             setMode('create');
-            setFormData(prev => ({ ...prev, buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '', retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '' }));
+            setFormData(prev => ({ ...prev, buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '', retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '', poLink: '' }));
             setHasExtracted(false);
           } else {
             setMode('list');
@@ -546,7 +592,10 @@ export default function Form({ authenticatedEmail, onLogout }) {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent-color)' }}>{po.poNumber || 'No PO #'}</span>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{po.poDate}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{displayFormatDate(po.poDate)}</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{displayFormatTimestamp(po.timestamp)}</span>
+                      </div>
                     </div>
                 <div style={{ fontSize: '0.9rem' }}>
                   <strong>Buyer:</strong> {po.buyerName}
@@ -572,9 +621,15 @@ export default function Form({ authenticatedEmail, onLogout }) {
     ) : (
     <form onSubmit={handleSubmit} className={`animate-slide-up delay-2 ${hasExtracted || mode === 'edit' ? 'post-extraction' : 'pre-extraction'}`}>
 
-      {mode === 'create' && <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />}
+      <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
+      
+      {mode === 'edit' && !file && (
+        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>
+          Upload a new document to replace the existing one, or leave it empty to keep the original attachment.
+        </div>
+      )}
 
-      <h3 style={{ marginTop: mode === 'edit' ? '0' : '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
+      <h3 style={{ marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
         <FileText size={22} color="var(--accent-color)" /> {mode === 'edit' ? 'Edit PO Details' : 'PO Details'}
       </h3>
 
@@ -783,21 +838,18 @@ export default function Form({ authenticatedEmail, onLogout }) {
             <div><strong style={{ color: 'var(--text-secondary)' }}>Retailer:</strong><br/>{selectedPO.retailerName}</div>
             <div><strong style={{ color: 'var(--text-secondary)' }}>Country:</strong><br/>{selectedPO.retailerCountry}</div>
             <div><strong style={{ color: 'var(--text-secondary)' }}>Amount:</strong><br/>{selectedPO.poAmount}</div>
-            <div><strong style={{ color: 'var(--text-secondary)' }}>PO Date:</strong><br/>{selectedPO.poDate}</div>
-            <div><strong style={{ color: 'var(--text-secondary)' }}>Ex-Factory:</strong><br/>{selectedPO.exFactoryDate}</div>
-            <div><strong style={{ color: 'var(--text-secondary)' }}>Onboard Vessel:</strong><br/>{selectedPO.onboardVesselDate}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>PO Date:</strong><br/>{displayFormatDate(selectedPO.poDate)}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Ex-Factory:</strong><br/>{displayFormatDate(selectedPO.exFactoryDate)}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Onboard Vessel:</strong><br/>{displayFormatDate(selectedPO.onboardVesselDate)}</div>
             <div><strong style={{ color: 'var(--text-secondary)' }}>Delivery Address:</strong><br/>{selectedPO.deliveryAddress}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Submitted On:</strong><br/>{displayFormatTimestamp(selectedPO.timestamp)}</div>
           </div>
           
           {selectedPO.poLink && (
             <div style={{ marginBottom: '1.5rem' }}>
               <strong style={{ color: 'var(--text-secondary)' }}>Attached Document:</strong>
               <div style={{ marginTop: '0.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)' }}>
-                {selectedPO.poLink.match(/\.(jpeg|jpg|gif|png)$/i) ? (
-                  <img src={selectedPO.poLink} alt="PO Document" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} />
-                ) : (
-                  <iframe src={selectedPO.poLink} style={{ width: '100%', height: '400px', border: 'none' }} title="PO Document" />
-                )}
+                {renderAttachment(selectedPO.poLink)}
               </div>
             </div>
           )}
@@ -818,7 +870,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
                   retailerCountry: selectedPO.retailerCountry,
                   exFactoryDate: selectedPO.exFactoryDate,
                   deliveryAddress: selectedPO.deliveryAddress,
-                  onboardVesselDate: selectedPO.onboardVesselDate
+                  onboardVesselDate: selectedPO.onboardVesselDate,
+                  poLink: selectedPO.poLink
                 });
                 setOriginalTimestamp(selectedPO.timestamp);
                 setEditingRowIndex(selectedPO.originalIndex);
