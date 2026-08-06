@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&family=Fredoka:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
   --bg-color: #ffffff; 
@@ -159,19 +159,18 @@ h1 {
 }
 
 .app-header p {
-  font-family: 'Fredoka', 'Bricolage Grotesque', sans-serif;
-  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  color: var(--text-heading);
   text-align: center;
   font-size: 1.05rem;
   font-weight: 600;
   margin: 0;
-  padding: 0.6rem 1.25rem;
-  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
-  border: 3px dashed #FFE66D;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  padding: 0.5rem 1.25rem;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  letter-spacing: 0.5px;
 }
 
 h3 {
