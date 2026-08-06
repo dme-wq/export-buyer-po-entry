@@ -397,7 +397,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
         <div className="form-group">
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-            <FileText size={14} color="var(--accent-color)"/> File Number (Virtual)
+            <FileText size={14} color="var(--accent-color)"/> File Number
           </label>
           <input 
             type="text" 
@@ -439,20 +439,6 @@ export default function Form({ authenticatedEmail, onLogout }) {
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-            <DollarSign size={14} color="var(--accent-color)"/> PO Amount
-          </label>
-          <input 
-            type="text" 
-            name="poAmount" 
-            className="form-input" 
-            value={formData.poAmount} 
-            onChange={handleChange} 
-            placeholder="Total Amount"
-            required
-          />
-        </div>
 
         <div className="form-group full-width">
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
@@ -541,6 +527,21 @@ export default function Form({ authenticatedEmail, onLogout }) {
             value={formData.onboardVesselDate} 
             onChange={handleChange} 
             onClick={(e) => e.target.showPicker && e.target.showPicker()}
+            required
+          />
+        </div>
+
+        <div className="form-group full-width">
+          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+            PO Amount
+          </label>
+          <input 
+            type="text" 
+            name="poAmount" 
+            className="form-input" 
+            value={formData.poAmount} 
+            onChange={handleChange} 
+            placeholder="Total Amount"
             required
           />
         </div>
