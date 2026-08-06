@@ -112,7 +112,7 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
   }
 
   return (
-    <div style={{ marginBottom: '2rem' }}>
+    <div style={{ marginBottom: '1rem' }}>
       <input
         ref={inputRef}
         type="file"
@@ -143,7 +143,7 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
         <p className="upload-subtext" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>Supports PDF, Excel, CSV, Images</p>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0', gap: '1rem' }}>
         <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
         <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>OR</span>
         <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
@@ -152,7 +152,7 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
       <button 
         type="button" 
         className="btn" 
-        style={{ width: '100%', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--glass-border)' }}
+        style={{ width: '100%', background: '#f8fafc', color: 'var(--text-heading)', border: '2px dashed #d1d5db' }}
         onClick={(e) => {
           e.preventDefault();
           cameraRef.current?.click();

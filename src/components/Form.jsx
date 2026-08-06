@@ -365,7 +365,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
-      <h3 style={{ marginTop: '2.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
+      <h3 style={{ marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
         <FileText size={22} color="var(--accent-color)" /> PO Details
       </h3>
 
@@ -403,7 +403,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             type="text" 
             className="form-input" 
             value={fileNumber} 
-            placeholder="Auto-populated"
+            placeholder=""
             readOnly
             style={{ backgroundColor: '#e2e8f0', cursor: 'default' }}
           />
@@ -434,7 +434,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={formData.poNumber} 
             onChange={handleChange} 
-            placeholder="Auto-extracted or manual entry"
+            placeholder=""
             required
           />
         </div>
@@ -464,7 +464,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={formData.deliveryAddress} 
             onChange={handleChange} 
-            placeholder="Auto-extracted or manual entry"
+            placeholder=""
             required
           />
         </div>
