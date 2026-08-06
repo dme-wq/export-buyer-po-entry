@@ -548,14 +548,14 @@ export default function Form({ authenticatedEmail, onLogout }) {
         style={{
           position: 'fixed',
           bottom: '24px',
-          right: '24px',
+          left: '24px',
           zIndex: 9999,
           background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
           color: '#ffffff',
           border: 'none',
           borderRadius: '50%',
-          width: '64px',
-          height: '64px',
+          width: '52px',
+          height: '52px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -573,7 +573,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         }}
         title={mode === 'list' ? 'Create New PO' : 'View & Edit My POs'}
       >
-        {mode === 'list' ? <Plus size={28} /> : <List size={28} />}
+        {mode === 'list' ? <Plus size={24} /> : <List size={24} />}
       </button>,
       document.body
     )}

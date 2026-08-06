@@ -15,6 +15,15 @@ const SHEET_ID = '16Qy4-m-cBaMrsjAWsgRbWIY3lwj84CURaWHcg93wZdM';
 const RESPONSES_TAB = 'Form Responses 2';
 const DROPDOWNS_TAB = 'Drop Downs';
 
+// Run this function ONCE manually from the Apps Script editor to grant Google Drive permissions
+function authorize() {
+  // This dummy call forces Google Apps Script to request full Drive write permissions
+  try {
+    DriveApp.createFile('dummy.txt', 'dummy content');
+  } catch (e) {}
+  Logger.log("Authorization successful!");
+}
+
 // Handle GET request to fetch Dropdowns and POs
 function doGet(e) {
   try {
@@ -111,6 +120,23 @@ function doPost(e) {
     const ss = SpreadsheetApp.openById(SHEET_ID);
     const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
     
+    // Check for Duplicate Entry on Create
+    if (data.action !== 'update' && data.poNumber && data.buyerName) {
+      const existingData = responsesSheet.getDataRange().getValues();
+      for (let i = 1; i < existingData.length; i++) {
+        const existingBuyer = String(existingData[i][2] || '').trim().toLowerCase();
+        const existingPo = String(existingData[i][4] || '').trim().toLowerCase();
+        
+        if (existingBuyer === String(data.buyerName).trim().toLowerCase() && 
+            existingPo === String(data.poNumber).trim().toLowerCase()) {
+          return ContentService.createTextOutput(JSON.stringify({
+            status: 'error',
+            message: 'Duplicate Entry: This PO Number for this Buyer already exists.'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    }
+    
     // Create new row array based on columns A to K
     // ColA: Timestamp
     // ColB: Email
@@ -130,14 +156,14 @@ function doPost(e) {
     // Handle File Upload to Google Drive
     if (data.fileContent) {
       try {
-        const folder = DriveApp.getFolderById('1rXerF7ZuTreU2FGUvsaT555PTmksrzRHyIib9TuIMwXquZNzfOhv-HmVb6ZJuB4J7nHExW8V');
+        const folder = DriveApp.getFolderById('11mJtKgVh7RSxfgZbhwdfKuMaHb8i4y-KCnA5jwMM_C_VroHeCAuIR4ZS-eW3xFvgdLueQHVw');
         const blob = Utilities.newBlob(Utilities.base64Decode(data.fileContent), data.mimeType || 'application/pdf', data.fileName || 'Uploaded_PO');
         const newFile = folder.createFile(blob);
-        newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        // newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); // Commented out to prevent Workspace policy errors
         poLink = newFile.getUrl();
       } catch (e) {
         console.error("Error uploading file to Drive: " + e.toString());
-        poLink = 'Error uploading: ' + data.fileName;
+        poLink = 'Error uploading: ' + data.fileName + ' | Error: ' + e.toString();
       }
     }
     
@@ -164,6 +190,68 @@ function doPost(e) {
       responsesSheet.getRange(data.rowIndex, 1, 1, 12).setValues([newRow]);
     } else {
       responsesSheet.appendRow(newRow);
+      
+      // WhatsApp Automation for New Entries
+      try {
+        const waSheet = ss.getSheetByName('whatsappNumber');
+        if (waSheet) {
+          const waData = waSheet.getDataRange().getValues();
+          const requests = [];
+          const MAYTAPI_PRODUCT_ID = '0d0df307-0553-4dfd-8597-e3c2fd5300eb';
+          const MAYTAPI_PHONE_ID = '34244';
+          const MAYTAPI_TOKEN = '54f10e32-bdf4-49cd-a464-33dc87c7c001';
+          const apiUrl = `https://api.maytapi.com/api/${MAYTAPI_PRODUCT_ID}/${MAYTAPI_PHONE_ID}/sendMessage`;
+          
+          for (let i = 1; i < waData.length; i++) {
+            const name = waData[i][0];
+            const rawNumber = String(waData[i][1]).replace(/\D/g, ''); // Extract only digits
+            if (!name || !rawNumber) continue;
+            
+            // Format number (prepend 91 if it's 10 digits)
+            let formattedNumber = rawNumber;
+            if (formattedNumber.length === 10) {
+              formattedNumber = '91' + formattedNumber;
+            }
+            
+            const messageText = `${name} Ji,\n\nA new Purchase Order has been submitted.\n📌 PO Number: ${data.poNumber || 'N/A'}\n👤 Buyer: ${data.buyerName || 'N/A'}\n🏢 Retailer: ${data.retailerName || 'N/A'}\n💰 Amount: ${data.poAmount || 'N/A'}\n📅 PO Date: ${data.poDate || 'N/A'}\n\nPlease find the attached document.`;
+            
+            let payload = {
+              to_number: formattedNumber,
+              type: "text",
+              message: messageText
+            };
+            
+            // If file content exists, send as media using base64
+            if (data.fileContent) {
+              payload = {
+                to_number: formattedNumber,
+                type: "media",
+                // Adding name=... to the data URI and a separate filename property for compatibility
+                message: `data:${data.mimeType || 'application/pdf'};name=${data.fileName || 'PO_Document.pdf'};base64,${data.fileContent}`,
+                text: messageText,
+                filename: data.fileName || 'PO_Document.pdf'
+              };
+            }
+            
+            requests.push({
+              url: apiUrl,
+              method: 'post',
+              headers: {
+                'x-maytapi-key': MAYTAPI_TOKEN,
+                'Content-Type': 'application/json'
+              },
+              payload: JSON.stringify(payload)
+            });
+          }
+          
+          if (requests.length > 0) {
+            // Send all requests in parallel
+            UrlFetchApp.fetchAll(requests);
+          }
+        }
+      } catch (waError) {
+        console.error("WhatsApp Error:", waError);
+      }
     }
     
     // Auto-append new Retailer Name to Drop Downs (Col G)
