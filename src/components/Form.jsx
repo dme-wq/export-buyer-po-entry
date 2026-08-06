@@ -76,6 +76,18 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const [isLoadingPOs, setIsLoadingPOs] = useState(false);
   const [editingRowIndex, setEditingRowIndex] = useState(null);
   const [originalTimestamp, setOriginalTimestamp] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPO, setSelectedPO] = useState(null);
+
+  const filteredPOs = userPOs.filter(po => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      (po.poNumber || '').toLowerCase().includes(query) ||
+      (po.buyerName || '').toLowerCase().includes(query) ||
+      (po.retailerName || '').toLowerCase().includes(query)
+    );
+  });
 
   useEffect(() => {
     if (mode === 'list') {
@@ -501,18 +513,41 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
             <Loader2 className="animate-spin" size={32} color="var(--accent-color)" />
           </div>
-        ) : userPOs.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem' }}>
-            No POs found. Click the + button to create one.
-          </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-            {userPOs.map((po, index) => (
-              <div key={index} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--glass-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent-color)' }}>{po.poNumber || 'No PO #'}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{po.poDate}</span>
-                </div>
+          <>
+            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+                <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+                <input 
+                  type="text" 
+                  placeholder="Search by PO, Buyer, or Retailer..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="form-input"
+                  style={{ paddingLeft: '36px', width: '100%' }}
+                />
+              </div>
+            </div>
+            
+            {filteredPOs.length === 0 ? (
+              <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem' }}>
+                No POs found. Click the + button to create one.
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                {filteredPOs.map((po, index) => (
+                  <div 
+                    key={index} 
+                    className="glass-panel" 
+                    onClick={() => setSelectedPO({ ...po, originalIndex: userPOs.findIndex(p => p.rowIndex === po.rowIndex) + 1 })}
+                    style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'transform 0.2s' }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent-color)' }}>{po.poNumber || 'No PO #'}</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{po.poDate}</span>
+                    </div>
                 <div style={{ fontSize: '0.9rem' }}>
                   <strong>Buyer:</strong> {po.buyerName}
                 </div>
@@ -524,47 +559,14 @@ export default function Form({ authenticatedEmail, onLogout }) {
                     {po.poAmount}
                   </div>
                 )}
-                <button 
-                  type="button"
-                  style={{ 
-                    marginTop: 'auto', 
-                    padding: '0.6rem', 
-                    background: 'rgba(123, 113, 249, 0.1)', 
-                    color: 'var(--accent-color)', 
-                    border: 'none', 
-                    borderRadius: '8px', 
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onClick={() => {
-                    setFormData({
-                      timestamp: po.timestamp,
-                      email: po.email,
-                      buyerName: po.buyerName,
-                      poDate: po.poDate,
-                      poNumber: po.poNumber,
-                      poAmount: po.poAmount,
-                      retailerName: po.retailerName,
-                      retailerCountry: po.retailerCountry,
-                      exFactoryDate: po.exFactoryDate,
-                      deliveryAddress: po.deliveryAddress,
-                      onboardVesselDate: po.onboardVesselDate
-                    });
-                    setOriginalTimestamp(po.timestamp);
-                    setEditingRowIndex(po.rowIndex);
-                    setMode('edit');
-                    setHasExtracted(true);
-                  }}
-                >
-                  <Edit3 size={16} /> Edit PO
-                </button>
+                <div style={{ marginTop: 'auto', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                  Click to view details
+                </div>
               </div>
             ))}
           </div>
+        )}
+        </>
         )}
       </div>
     ) : (
@@ -765,6 +767,73 @@ export default function Form({ authenticatedEmail, onLogout }) {
       
     </form>
     )}
+
+    {/* PO Details Modal */}
+    {selectedPO && createPortal(
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setSelectedPO(null)}>
+        <div className="glass-panel" style={{ width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', position: 'relative', borderRadius: '16px' }} onClick={e => e.stopPropagation()}>
+          <button onClick={() => setSelectedPO(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✖</button>
+          
+          <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--text-heading)', fontSize: '1.4rem' }}>
+            <span style={{ color: 'var(--accent-color)' }}>PO:</span> {selectedPO.poNumber}
+          </h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Buyer:</strong><br/>{selectedPO.buyerName}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Retailer:</strong><br/>{selectedPO.retailerName}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Country:</strong><br/>{selectedPO.retailerCountry}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Amount:</strong><br/>{selectedPO.poAmount}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>PO Date:</strong><br/>{selectedPO.poDate}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Ex-Factory:</strong><br/>{selectedPO.exFactoryDate}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Onboard Vessel:</strong><br/>{selectedPO.onboardVesselDate}</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Delivery Address:</strong><br/>{selectedPO.deliveryAddress}</div>
+          </div>
+          
+          {selectedPO.poLink && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <strong style={{ color: 'var(--text-secondary)' }}>Attached Document:</strong>
+              <div style={{ marginTop: '0.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)' }}>
+                {selectedPO.poLink.match(/\.(jpeg|jpg|gif|png)$/i) ? (
+                  <img src={selectedPO.poLink} alt="PO Document" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} />
+                ) : (
+                  <iframe src={selectedPO.poLink} style={{ width: '100%', height: '400px', border: 'none' }} title="PO Document" />
+                )}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+            <button 
+              className="btn btn-primary" 
+              style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }}
+              onClick={() => {
+                setFormData({
+                  timestamp: selectedPO.timestamp,
+                  email: selectedPO.email,
+                  buyerName: selectedPO.buyerName,
+                  poDate: selectedPO.poDate,
+                  poNumber: selectedPO.poNumber,
+                  poAmount: selectedPO.poAmount,
+                  retailerName: selectedPO.retailerName,
+                  retailerCountry: selectedPO.retailerCountry,
+                  exFactoryDate: selectedPO.exFactoryDate,
+                  deliveryAddress: selectedPO.deliveryAddress,
+                  onboardVesselDate: selectedPO.onboardVesselDate
+                });
+                setOriginalTimestamp(selectedPO.timestamp);
+                setEditingRowIndex(selectedPO.originalIndex);
+                setMode('edit');
+                setSelectedPO(null);
+              }}
+            >
+              <Edit3 size={18} /> Edit This Entry
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    )}
+
     </>
   );
 }
