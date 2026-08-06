@@ -83,8 +83,8 @@ function App() {
   // Authenticated State (WebForm Screen)
   return (
     <>
-      <header className="app-header animate-slide-up">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left' }}>
+      <header className="app-header animate-slide-up" style={{ justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', textAlign: 'center' }}>
           <div className="app-logo" style={{ marginBottom: 0 }}>
             <img 
               src="https://static.wixstatic.com/media/68b92a_d71e34133826499983234774dea1945b~mv2.png/v1/fill/w_186,h_156,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/RKD-Logo.png" 
