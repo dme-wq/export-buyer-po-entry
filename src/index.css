@@ -185,7 +185,7 @@ p {
 }
 
 .form-label {
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
@@ -198,7 +198,7 @@ p {
   background: #f8fafc; /* Elegant light slate background */
   border: 1.5px solid #cbd5e1; /* Visible elegant border */
   border-radius: 12px;
-  padding: 0.8rem 1rem;
+  padding: 0.6rem 0.8rem;
   color: var(--text-heading);
   font-size: 1.1rem;
   font-family: inherit;
@@ -292,7 +292,7 @@ select.form-input option {
   
   .form-input {
     font-size: 1.2rem;
-    padding: 1rem;
+    padding: 0.8rem;
   }
 }
 

@@ -151,7 +151,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         borderColor: border,
         borderRadius: '12px',
         padding: '0',
-        minHeight: '46px', // Slightly taller for mobile tap target
+        minHeight: '40px', // Slightly taller for mobile tap target
         fontSize: '1.1rem',
         boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
         cursor: 'pointer',
@@ -185,7 +185,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
       backgroundColor: state.isSelected ? 'var(--accent-color)' : (state.isFocused ? '#fef08a' : 'white'),
       color: state.isSelected ? 'white' : 'black',
       cursor: 'pointer',
-      padding: '12px 14px', // Taller options for tapping
+      padding: '8px 12px', // Taller options for tapping
     }),
   });
 
