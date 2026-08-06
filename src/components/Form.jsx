@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2, List, Plus, Edit3 } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
@@ -432,52 +433,52 @@ export default function Form({ authenticatedEmail, onLogout }) {
     <>
     <Toaster position="top-center" reverseOrder={false} />
 
-    {/* Floating Toggle Button */}
-    <button
-      type="button"
-      onClick={() => {
-        if (mode === 'list') {
-          setMode('create');
-          setFormData(prev => ({ ...prev, buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '', retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '' }));
-          setHasExtracted(false);
-        } else {
-          setMode('list');
-        }
-      }}
-      style={{
-        position: 'fixed',
-        bottom: '30px',
-        left: '30px',
-        zIndex: 1000,
-        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '30px',
-        padding: '0 24px',
-        height: '56px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(79, 70, 229, 0.1)',
-        cursor: 'pointer',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        fontWeight: '600',
-        fontSize: '15px',
-        letterSpacing: '0.5px'
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(79, 70, 229, 0.5), 0 10px 10px -5px rgba(79, 70, 229, 0.1)';
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(79, 70, 229, 0.1)';
-      }}
-      title={mode === 'list' ? 'Create New PO' : 'View & Edit My POs'}
-    >
-      {mode === 'list' ? <><Plus size={20} /> New PO</> : <><List size={20} /> Edit My POs</>}
-    </button>
+    {/* Floating Toggle Button (Portaled to body to escape CSS transform context) */}
+    {createPortal(
+      <button
+        type="button"
+        onClick={() => {
+          if (mode === 'list') {
+            setMode('create');
+            setFormData(prev => ({ ...prev, buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '', retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '' }));
+            setHasExtracted(false);
+          } else {
+            setMode('list');
+          }
+        }}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+          color: '#ffffff',
+          border: 'none',
+          borderRadius: '50%',
+          width: '64px',
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.6), 0 8px 10px -6px rgba(79, 70, 229, 0.2)',
+          cursor: 'pointer',
+          transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(79, 70, 229, 0.6), 0 10px 10px -5px rgba(79, 70, 229, 0.2)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(79, 70, 229, 0.6), 0 8px 10px -6px rgba(79, 70, 229, 0.2)';
+        }}
+        title={mode === 'list' ? 'Create New PO' : 'View & Edit My POs'}
+      >
+        {mode === 'list' ? <Plus size={28} /> : <List size={28} />}
+      </button>,
+      document.body
+    )}
+
     
     {mode === 'list' ? (
       <div className="animate-slide-up" style={{ padding: '1rem 0' }}>
