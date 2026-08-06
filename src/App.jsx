@@ -95,19 +95,7 @@ function App() {
           <p style={{ margin: 0 }}>Export Buyer Purchase Order Entry</p>
         </div>
         
-        {/* Header Profile Badge */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', fontSize: '0.75rem', marginTop: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-            <Clock size={12} /> {currentTime}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--success-color)', fontWeight: 600 }}>
-              <CheckCircle size={12} /> {userEmail} 
-              <button type="button" onClick={() => {
-                 localStorage.removeItem('userEmail');
-                 setUserEmail(null);
-              }} style={{color: 'var(--error-color)', border: 'none', background: 'none', marginLeft: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', padding: '2px 6px', borderRadius: '4px', background: '#ffebee'}}>Sign Out</button>
-          </div>
-        </div>
+
       </header>
       
       <main className="container animate-slide-up delay-1">
