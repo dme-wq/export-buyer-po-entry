@@ -229,7 +229,14 @@ function doPost(e) {
               formattedNumber = '91' + formattedNumber;
             }
             
-            const messageText = `${name} Ji,\n\nA new Purchase Order has been submitted.\n📌 PO Number: ${data.poNumber || 'N/A'}\n👤 Buyer: ${data.buyerName || 'N/A'}\n🏢 Retailer: ${data.retailerName || 'N/A'}\n💰 Amount: ${data.poAmount || 'N/A'}\n📅 PO Date: ${data.poDate || 'N/A'}\n\nPlease find the attached document.`;
+            const currentHour = new Date().getHours();
+            let greetingTime = 'Good Evening';
+            if (currentHour < 12) {
+              greetingTime = 'Good Morning';
+            } else if (currentHour < 17) {
+              greetingTime = 'Good Afternoon';
+            }
+            const messageText = `Dear ${name} Ji,\n${greetingTime}!\n\nA new Purchase Order has been submitted.\n📌 PO Number: ${data.poNumber || 'N/A'}\n👤 Buyer: ${data.buyerName || 'N/A'}\n🏢 Retailer: ${data.retailerName || 'N/A'}\n💰 Amount: ${data.poAmount || 'N/A'}\n📅 PO Date: ${data.poDate || 'N/A'}\n\nPlease find the attached document.`;
             
             let payload = {
               to_number: formattedNumber,
