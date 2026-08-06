@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign } from 'lucide-react';
+import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2 } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
@@ -135,7 +135,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         border = 'darkred';
         textCol = 'white';
         phCol = 'rgba(255,255,255,0.8)';
-      } else if (isInvalid && !state.isFocused) {
+      } else if (isEmpty && !state.isFocused) {
         if (hasExtractedValue) {
           bg = '#fca5a5';
           border = '#f87171';
