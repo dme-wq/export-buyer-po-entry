@@ -152,7 +152,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         borderRadius: '12px',
         padding: '0',
         minHeight: '46px', // Slightly taller for mobile tap target
-        fontSize: '1rem',
+        fontSize: '1.1rem',
         boxShadow: state.isFocused ? '0 4px 16px rgba(123, 113, 249, 0.15)' : 'none',
         cursor: 'pointer',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -166,19 +166,19 @@ export default function Form({ authenticatedEmail, onLogout }) {
       ...provided,
       color: isMismatch ? 'white' : 'var(--text-heading)',
       fontWeight: 600,
-      fontSize: '1rem',
+      fontSize: '1.1rem',
     }),
     placeholder: (provided, state) => ({
       ...provided,
       color: isMismatch ? 'rgba(255, 255, 255, 0.8)' : (isEmpty && !state.isFocused ? 'rgba(0,0,0,0.6)' : 'var(--input-placeholder)'),
-      fontSize: '0.95rem',
+      fontSize: '1.05rem',
     }),
     menu: (provided) => ({
       ...provided,
       borderRadius: '12px',
       overflow: 'hidden',
       zIndex: 100,
-      fontSize: '1rem',
+      fontSize: '1.1rem',
     }),
     option: (provided, state) => ({
       ...provided,
@@ -365,8 +365,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
       <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
 
-      <h3 style={{ marginTop: '2rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-        <FileText size={20} color="var(--accent-color)" /> PO Details
+      <h3 style={{ marginTop: '2.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
+        <FileText size={22} color="var(--accent-color)" /> PO Details
       </h3>
 
       <div className="form-grid">
@@ -470,8 +470,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
       </div>
 
-      <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #f3f4f6', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-        <Box size={20} color="var(--accent-color)" /> Retailer & Shipping
+      <h3 style={{ marginTop: '2.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
+        <Box size={22} color="var(--accent-color)" /> Retailer & Shipping
       </h3>
 
       <div className="form-grid">

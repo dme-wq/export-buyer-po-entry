@@ -27,7 +27,7 @@
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Calibri', 'Nunito', sans-serif;
   background: linear-gradient(120deg, #ffffff 0%, #f1f5f9 50%, #ffffff 100%);
   background-size: 200% 200%;
   animation: gradientFlow 10s ease infinite;
@@ -200,7 +200,7 @@ p {
   border-radius: 12px;
   padding: 0.8rem 1rem;
   color: var(--text-heading);
-  font-size: 0.9rem; /* Reduced */
+  font-size: 1.1rem;
   font-family: inherit;
   font-weight: 600;
   outline: none;
@@ -291,7 +291,7 @@ select.form-input option {
   }
   
   .form-input {
-    font-size: 1rem; /* Increase font size on mobile */
+    font-size: 1.2rem;
     padding: 1rem;
   }
 }
