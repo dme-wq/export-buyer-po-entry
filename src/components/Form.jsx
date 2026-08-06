@@ -474,17 +474,32 @@ export default function Form({ authenticatedEmail, onLogout }) {
       return <div style={{ padding: '1rem', color: 'var(--text-secondary)' }}>Invalid attachment link.</div>;
     }
 
-    // Convert Google Drive view link to preview link for correct iframe embedding
-    let embedLink = link;
-    if (link.includes('drive.google.com/file/d/')) {
-      embedLink = link.replace(/\/view.*$/, '/preview');
-    }
-
-    if (link.match(/\.(jpeg|jpg|gif|png)$/i)) {
-      return <img src={link} alt="PO Document" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} />;
-    }
-
-    return <iframe src={embedLink} style={{ width: '100%', height: '400px', border: 'none', background: '#f8fafc' }} title="PO Document" />;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '1.5rem', background: '#f8fafc' }}>
+        <a 
+          href={link} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '8px', 
+            padding: '0.75rem 2rem', 
+            borderRadius: '50px',
+            background: 'linear-gradient(135deg, #7b71f9 0%, #6054f0 100%)',
+            color: 'white',
+            fontWeight: '600',
+            textDecoration: 'none',
+            boxShadow: '0 4px 10px rgba(123, 113, 249, 0.3)',
+            transition: 'transform 0.2s'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          View Document
+        </a>
+      </div>
+    );
   };
 
   return (
