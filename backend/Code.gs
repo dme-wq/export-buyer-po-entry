@@ -15,10 +15,47 @@ const SHEET_ID = '16Qy4-m-cBaMrsjAWsgRbWIY3lwj84CURaWHcg93wZdM';
 const RESPONSES_TAB = 'Form Responses 2';
 const DROPDOWNS_TAB = 'Drop Downs';
 
-// Handle GET request to fetch Dropdowns
+// Handle GET request to fetch Dropdowns and POs
 function doGet(e) {
   try {
     const ss = SpreadsheetApp.openById(SHEET_ID);
+    
+    // Handle fetching POs for a specific user
+    if (e.parameter.action === 'getPOs' && e.parameter.email) {
+      const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
+      const data = responsesSheet.getDataRange().getValues();
+      const userPOs = [];
+      
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (row[1] === e.parameter.email) {
+          userPOs.push({
+            rowIndex: i + 1,
+            timestamp: row[0],
+            email: row[1],
+            buyerName: row[2],
+            poDate: row[3] ? Utilities.formatDate(new Date(row[3]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+            poNumber: row[4],
+            retailerName: row[5],
+            retailerCountry: row[6],
+            exFactoryDate: row[7] ? Utilities.formatDate(new Date(row[7]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+            deliveryAddress: row[8],
+            poLink: row[9],
+            onboardVesselDate: row[10] ? Utilities.formatDate(new Date(row[10]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+            poAmount: row[11]
+          });
+        }
+      }
+      
+      // Sort by newest first
+      userPOs.sort((a, b) => b.rowIndex - a.rowIndex);
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        data: userPOs
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     const dropDownSheet = ss.getSheetByName(DROPDOWNS_TAB);
     
     // Prevent error if sheet has fewer than 2 rows
@@ -119,7 +156,15 @@ function doPost(e) {
       data.poAmount || ''
     ];
     
-    responsesSheet.appendRow(newRow);
+    if (data.action === 'update' && data.rowIndex) {
+      // For updates, we keep the original timestamp if not provided new
+      if (data.originalTimestamp) {
+        newRow[0] = data.originalTimestamp;
+      }
+      responsesSheet.getRange(data.rowIndex, 1, 1, 12).setValues([newRow]);
+    } else {
+      responsesSheet.appendRow(newRow);
+    }
     
     // Auto-append new Retailer Name to Drop Downs (Col G)
     const dropDownSheet = ss.getSheetByName(DROPDOWNS_TAB);

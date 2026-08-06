@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2 } from 'lucide-react';
+import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2, List, Plus, Edit3 } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
@@ -68,6 +68,36 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const [hasExtracted, setHasExtracted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  // New states for Edit Interface
+  const [mode, setMode] = useState('create'); // 'create', 'list', 'edit'
+  const [userPOs, setUserPOs] = useState([]);
+  const [isLoadingPOs, setIsLoadingPOs] = useState(false);
+  const [editingRowIndex, setEditingRowIndex] = useState(null);
+  const [originalTimestamp, setOriginalTimestamp] = useState(null);
+
+  useEffect(() => {
+    if (mode === 'list') {
+      fetchUserPOs();
+    }
+  }, [mode]);
+
+  const fetchUserPOs = async () => {
+    setIsLoadingPOs(true);
+    try {
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const response = await fetch(`${scriptUrl}?action=getPOs&email=${encodeURIComponent(authenticatedEmail)}`);
+      const result = await response.json();
+      if (result.status === 'success') {
+        setUserPOs(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching POs:", err);
+      toast.error("Failed to load your POs");
+    } finally {
+      setIsLoadingPOs(false);
+    }
+  };
 
   // Fetch dynamic dropdowns with localStorage caching for instant loading
   useEffect(() => {
@@ -339,7 +369,10 @@ export default function Form({ authenticatedEmail, onLogout }) {
       ...formData,
       fileContent: fileBase64,
       fileName: fileName,
-      mimeType: mimeType
+      mimeType: mimeType,
+      action: mode === 'edit' ? 'update' : 'create',
+      rowIndex: editingRowIndex,
+      originalTimestamp: originalTimestamp
     };
 
     try {
@@ -381,6 +414,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             setIsSubmitted(false);
             setHasExtracted(false);
             setFile(null);
+            setMode(mode === 'edit' ? 'list' : 'create');
             setFormData(prev => ({
               ...prev,
               buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '',
@@ -388,7 +422,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
             }));
           }}
         >
-          Submit Another PO
+          {mode === 'edit' ? 'Back to PO List' : 'Submit Another PO'}
         </button>
       </div>
     );
@@ -397,13 +431,123 @@ export default function Form({ authenticatedEmail, onLogout }) {
   return (
     <>
     <Toaster position="top-center" reverseOrder={false} />
+
+    {/* Floating Toggle Button */}
+    <button
+      type="button"
+      onClick={() => {
+        if (mode === 'list') {
+          setMode('create');
+          setFormData(prev => ({ ...prev, buyerName: '', poDate: '', poNumber: '', poAmount: '', retailerName: '', retailerCountry: '', exFactoryDate: '', deliveryAddress: '', onboardVesselDate: '' }));
+          setHasExtracted(false);
+        } else {
+          setMode('list');
+        }
+      }}
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 1000,
+        background: 'var(--accent-color)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '50%',
+        width: '56px',
+        height: '56px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 12px rgba(123, 113, 249, 0.4)',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease'
+      }}
+      title={mode === 'list' ? 'New PO' : 'View My POs'}
+    >
+      {mode === 'list' ? <Plus size={24} /> : <List size={24} />}
+    </button>
     
-    <form onSubmit={handleSubmit} className={`animate-slide-up delay-2 ${hasExtracted ? 'post-extraction' : 'pre-extraction'}`}>
+    {mode === 'list' ? (
+      <div className="animate-slide-up" style={{ padding: '1rem 0' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--text-heading)' }}>My Submitted POs</h2>
+        
+        {isLoadingPOs ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
+            <Loader2 className="animate-spin" size={32} color="var(--accent-color)" />
+          </div>
+        ) : userPOs.length === 0 ? (
+          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem' }}>
+            No POs found. Click the + button to create one.
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+            {userPOs.map((po, index) => (
+              <div key={index} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--glass-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--accent-color)' }}>{po.poNumber || 'No PO #'}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{po.poDate}</span>
+                </div>
+                <div style={{ fontSize: '0.9rem' }}>
+                  <strong>Buyer:</strong> {po.buyerName}
+                </div>
+                <div style={{ fontSize: '0.9rem' }}>
+                  <strong>Retailer:</strong> {po.retailerName}
+                </div>
+                {po.poAmount && (
+                  <div style={{ fontSize: '0.9rem', color: 'var(--success-color)', fontWeight: 'bold' }}>
+                    {po.poAmount}
+                  </div>
+                )}
+                <button 
+                  type="button"
+                  style={{ 
+                    marginTop: 'auto', 
+                    padding: '0.6rem', 
+                    background: 'rgba(123, 113, 249, 0.1)', 
+                    color: 'var(--accent-color)', 
+                    border: 'none', 
+                    borderRadius: '8px', 
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onClick={() => {
+                    setFormData({
+                      timestamp: po.timestamp,
+                      email: po.email,
+                      buyerName: po.buyerName,
+                      poDate: po.poDate,
+                      poNumber: po.poNumber,
+                      poAmount: po.poAmount,
+                      retailerName: po.retailerName,
+                      retailerCountry: po.retailerCountry,
+                      exFactoryDate: po.exFactoryDate,
+                      deliveryAddress: po.deliveryAddress,
+                      onboardVesselDate: po.onboardVesselDate
+                    });
+                    setOriginalTimestamp(po.timestamp);
+                    setEditingRowIndex(po.rowIndex);
+                    setMode('edit');
+                    setHasExtracted(true);
+                  }}
+                >
+                  <Edit3 size={16} /> Edit PO
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ) : (
+    <form onSubmit={handleSubmit} className={`animate-slide-up delay-2 ${hasExtracted || mode === 'edit' ? 'post-extraction' : 'pre-extraction'}`}>
 
-      <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />
+      {mode === 'create' && <FileUpload onFileSelect={handleFileUpload} file={file} isExtracting={isExtracting} />}
 
-      <h3 style={{ marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
-        <FileText size={22} color="var(--accent-color)" /> PO Details
+      <h3 style={{ marginTop: mode === 'edit' ? '0' : '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
+        <FileText size={22} color="var(--accent-color)" /> {mode === 'edit' ? 'Edit PO Details' : 'PO Details'}
       </h3>
 
       <div className="form-grid">
