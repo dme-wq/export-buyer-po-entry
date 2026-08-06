@@ -547,7 +547,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
       </div>
 
-      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
           {isSubmitting ? (
              <><Loader2 className="btn-icon animate-spin" size={18} /> Submitting...</>

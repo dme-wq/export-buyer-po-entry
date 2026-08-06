@@ -144,9 +144,10 @@ h1 {
   z-index: 10;
   position: relative;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  gap: 1rem;
 }
 
 @media (max-width: 600px) {
@@ -160,7 +161,7 @@ h1 {
 .app-header p {
   font-family: 'Bricolage Grotesque', sans-serif;
   color: var(--text-heading);
-  text-align: left;
+  text-align: center;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
