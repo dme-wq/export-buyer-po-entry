@@ -63,8 +63,7 @@ function App() {
               style={{ height: '64px', width: 'auto', objectFit: 'contain' }}
             />
           </div>
-          <h1 style={{ color: 'var(--text-heading)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Secure Access</h1>
-          <p style={{ marginBottom: '2rem', fontSize: '0.875rem' }}>Please sign in with your Google account to access the PO Entry WebForm.</p>
+          <p style={{ marginTop: '1rem', marginBottom: '2rem', fontSize: '0.875rem' }}>Please sign in with your Google account to access the RKD Purchase Order Export.</p>
           
           <GoogleLogin
             onSuccess={handleLoginSuccess}
