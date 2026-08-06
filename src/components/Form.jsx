@@ -446,25 +446,37 @@ export default function Form({ authenticatedEmail, onLogout }) {
       }}
       style={{
         position: 'fixed',
-        bottom: '24px',
-        right: '24px',
+        bottom: '30px',
+        left: '30px',
         zIndex: 1000,
-        background: '#0f172a',
+        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
         color: '#ffffff',
-        border: '3px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '50%',
-        width: '60px',
-        height: '60px',
+        border: 'none',
+        borderRadius: '30px',
+        padding: '0 24px',
+        height: '56px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 4px 12px rgba(123, 113, 249, 0.4)',
+        gap: '12px',
+        boxShadow: '0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(79, 70, 229, 0.1)',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        fontWeight: '600',
+        fontSize: '15px',
+        letterSpacing: '0.5px'
       }}
-      title={mode === 'list' ? 'New PO' : 'View My POs'}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(79, 70, 229, 0.5), 0 10px 10px -5px rgba(79, 70, 229, 0.1)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(79, 70, 229, 0.1)';
+      }}
+      title={mode === 'list' ? 'Create New PO' : 'View & Edit My POs'}
     >
-      {mode === 'list' ? <Plus size={24} /> : <List size={24} />}
+      {mode === 'list' ? <><Plus size={20} /> New PO</> : <><List size={20} /> Edit My POs</>}
     </button>
     
     {mode === 'list' ? (
