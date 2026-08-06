@@ -149,17 +149,34 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
         <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
       </div>
 
-      <button 
-        type="button" 
-        className="btn" 
-        style={{ width: '100%', background: '#f8fafc', color: 'var(--text-heading)', border: '2px dashed #d1d5db' }}
-        onClick={(e) => {
-          e.preventDefault();
-          cameraRef.current?.click();
-        }}
-      >
-        <Camera className="btn-icon" size={18} /> Capture with Camera
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <button 
+          type="button" 
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '0.6rem 1.25rem', 
+            borderRadius: '50px',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #7b71f9 0%, #6054f0 100%)', 
+            color: 'white', 
+            border: 'none',
+            boxShadow: '0 4px 10px rgba(123, 113, 249, 0.3)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 15px rgba(123, 113, 249, 0.4)' }}
+          onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(123, 113, 249, 0.3)' }}
+          onClick={(e) => {
+            e.preventDefault();
+            cameraRef.current?.click();
+          }}
+        >
+          <Camera style={{ marginRight: '6px' }} size={16} /> Capture with Camera
+        </button>
+      </div>
     </div>
   );
 }
