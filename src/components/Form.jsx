@@ -116,17 +116,28 @@ export default function Form({ authenticatedEmail, onLogout }) {
   }, [mode]);
 
   const fetchUserPOs = async () => {
-    setIsLoadingPOs(true);
+    const cacheKey = `userPOsCache_${authenticatedEmail}`;
+    const cached = localStorage.getItem(cacheKey);
+    
+    if (cached) {
+      setUserPOs(JSON.parse(cached));
+      setIsLoadingPOs(false); // Instantly stop loading if we have cached data
+    } else {
+      setIsLoadingPOs(true); // Only show spinner if we have no data
+    }
+    
     try {
       const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
       const response = await fetch(`${scriptUrl}?action=getPOs&email=${encodeURIComponent(authenticatedEmail)}`);
       const result = await response.json();
       if (result.status === 'success') {
         setUserPOs(result.data);
+        localStorage.setItem(cacheKey, JSON.stringify(result.data));
       }
     } catch (err) {
       console.error("Error fetching POs:", err);
-      toast.error("Failed to load your POs");
+      // Only show error if we have no cached data, to not interrupt the user
+      if (!cached) toast.error("Failed to load your POs");
     } finally {
       setIsLoadingPOs(false);
     }
