@@ -120,6 +120,22 @@ function doPost(e) {
     const ss = SpreadsheetApp.openById(SHEET_ID);
     const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
     
+    // Append shortName to poNumber
+    if (data.poNumber && data.buyerName) {
+      const buyerSheet = ss.getSheetByName('Buyer Name');
+      if (buyerSheet) {
+        const lrBuyer = Math.max(buyerSheet.getLastRow(), 2);
+        const buyerData = buyerSheet.getRange('A2:O' + lrBuyer).getValues();
+        const matchedBuyer = buyerData.find(row => String(row[6] || '').trim().toLowerCase() === String(data.buyerName).trim().toLowerCase());
+        if (matchedBuyer && matchedBuyer[14]) {
+          const suffix = '_' + String(matchedBuyer[14]).trim();
+          if (!String(data.poNumber).endsWith(suffix)) {
+            data.poNumber = String(data.poNumber) + suffix;
+          }
+        }
+      }
+    }
+
     // Check for Duplicate Entry on Create
     if (data.action !== 'update' && data.poNumber && data.buyerName) {
       const existingData = responsesSheet.getDataRange().getValues();

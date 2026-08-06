@@ -204,14 +204,6 @@ export default function Form({ authenticatedEmail, onLogout }) {
       const matchedBuyer = dropdownData.buyers.find(b => b.buyerName === formData.buyerName);
       if (matchedBuyer) {
         setFileNumber(matchedBuyer.fileNumber);
-        
-        // Append short name to poNumber if both exist
-        if (formData.poNumber && matchedBuyer.shortName) {
-           const suffix = '_' + matchedBuyer.shortName;
-           if (!formData.poNumber.endsWith(suffix)) {
-             setFormData(prev => ({ ...prev, poNumber: prev.poNumber + suffix }));
-           }
-        }
       } else {
         setFileNumber('');
       }
