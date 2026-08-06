@@ -408,30 +408,32 @@ export default function Form({ authenticatedEmail, onLogout }) {
       originalTimestamp: originalTimestamp
     };
 
-    try {
-      const response = await fetch(scriptUrl, {
-        method: 'POST',
-        // 'no-cors' is often needed for simple Apps Script POSTs from browsers, 
-        // but 'cors' is better if doOptions is configured correctly.
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(payload)
-      });
-      
-      const result = await response.json();
+    // INSTANTLY SHOW SUCCESS
+    toast.success("PO Submission started in background!");
+    setIsSubmitted(true);
+    setIsSubmitting(false);
+
+    // Run fetch in the background without awaiting it
+    fetch(scriptUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(result => {
       if (result.status === 'success') {
-        toast.success("PO Submitted to FMS Successfully!");
-        setIsSubmitted(true);
+        toast.success(`Background submit completed for PO: ${payload.poNumber || 'New Entry'}`);
       } else {
-        throw new Error(result.message || "Failed to submit");
+        toast.error(`Background submit failed for PO: ${payload.poNumber || 'New Entry'}`);
+        console.error(result.message);
       }
-    } catch (error) {
+    })
+    .catch(error => {
       console.error("Submission Error:", error);
-      toast.error("Failed to save to Google Sheets. Please check configuration.");
-    } finally {
-      setIsSubmitting(false);
-    }
+      toast.error(`Failed to save PO ${payload.poNumber || 'New Entry'} to Google Sheets.`);
+    });
   };
 
   if (isSubmitted) {
