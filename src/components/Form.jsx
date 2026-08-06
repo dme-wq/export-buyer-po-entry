@@ -6,6 +6,42 @@ import { extractPODataWithGemini } from '../utils/gemini';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
+const CustomDateInput = ({ name, value, onChange, required, className }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    if (!year || !month || !day) return dateStr;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${day}-${months[parseInt(month, 10) - 1]}-${year}`;
+  };
+
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
+      <input
+        type={isFocused || !value ? 'date' : 'text'}
+        name={name}
+        className={className}
+        value={isFocused || !value ? value : formatDate(value)}
+        onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onClick={(e) => {
+          if (e.target.type === 'date' && e.target.showPicker) {
+            try { e.target.showPicker(); } catch (err) {}
+          }
+        }}
+        required={required}
+        style={{ width: '100%' }}
+      />
+      {!isFocused && value && (
+         <Calendar size={18} color="var(--text-heading)" style={{ position: 'absolute', right: '12px', pointerEvents: 'none' }} />
+      )}
+    </div>
+  );
+};
+
 export default function Form({ authenticatedEmail, onLogout }) {
   const [dropdownData, setDropdownData] = useState({ retailers: [], countries: [], buyers: [] });
   const [isBuyerNameInvalid, setIsBuyerNameInvalid] = useState(false);
@@ -413,13 +449,11 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Calendar size={14} color="var(--accent-color)"/> PO Date
           </label>
-          <input 
-            type="date" 
+          <CustomDateInput 
             name="poDate" 
             className="form-input" 
             value={formData.poDate} 
             onChange={handleChange} 
-            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
@@ -510,13 +544,11 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Truck size={14} color="var(--accent-color)"/> Ex-Factory Date
           </label>
-          <input 
-            type="date" 
+          <CustomDateInput 
             name="exFactoryDate" 
             className="form-input" 
             value={formData.exFactoryDate} 
             onChange={handleChange} 
-            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
@@ -525,13 +557,11 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Ship size={14} color="var(--accent-color)"/> Onboard Vessel Date
           </label>
-          <input 
-            type="date" 
+          <CustomDateInput 
             name="onboardVesselDate" 
             className="form-input" 
             value={formData.onboardVesselDate} 
             onChange={handleChange} 
-            onClick={(e) => e.target.showPicker && e.target.showPicker()}
             required
           />
         </div>
