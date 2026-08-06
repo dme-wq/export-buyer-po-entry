@@ -26,21 +26,18 @@
   padding: 0;
 }
 
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Calibri', 'Nunito', sans-serif;
   background: linear-gradient(120deg, #ffffff 0%, #f1f5f9 50%, #ffffff 100%);
-  background-size: 200% 200%;
-  animation: gradientFlow 10s ease infinite;
   color: var(--text-primary);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-}
-
-@keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 /* Decorative Blobs mimicking the new template */
@@ -95,16 +92,9 @@ body::after {
   width: 100%;
   padding: 4px;
   border-radius: 20px;
-  background: linear-gradient(45deg, #FF3366, #FF9933, #33CCFF, #9933FF, #FF3366);
-  background-size: 300% 300%;
-  animation: swingColors 6s ease-in-out infinite;
+  background: linear-gradient(45deg, #FF3366, #FF9933, #33CCFF, #9933FF);
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-@keyframes swingColors {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  transform: translateZ(0);
 }
 
 /* Main Form Card - Now inside animated wrapper */
