@@ -53,7 +53,7 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
     return (
       <div className="upload-zone" style={{ border: 'none', background: 'rgba(79, 70, 229, 0.1)' }}>
         <Loader2 className="upload-icon animate-spin" size={48} style={{ animation: 'spin 2s linear infinite' }} />
-        <h3 className="upload-text">Extracting PO Data (OCR)...</h3>
+        <h3 className="upload-text">RKD Engine is Analysing and Extracting Data...</h3>
         <p className="upload-subtext">Please wait while we process the document.</p>
         <style>{`
           @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -65,22 +65,8 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
   if (file) {
     return (
       <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem', textAlign: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success-color)' }}>
-            <File size={20} />
-            <span style={{ fontWeight: 600 }}>{file.name}</span>
-          </div>
-          <button 
-            type="button" 
-            onClick={() => { onFileSelect(null); setPreview(null); }}
-            style={{ background: 'none', border: 'none', color: 'var(--error-color)', cursor: 'pointer', fontSize: '0.875rem' }}
-          >
-            Remove / Change
-          </button>
-        </div>
-        
-        {preview && (
-          <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {preview && (
             <a 
               href={preview} 
               target="_blank" 
@@ -105,8 +91,27 @@ export default function FileUpload({ onFileSelect, file, isExtracting }) {
               <ExternalLink size={16} />
               View Uploaded Document
             </a>
-          </div>
-        )}
+          )}
+          <button 
+            type="button" 
+            onClick={() => { onFileSelect(null); setPreview(null); }}
+            style={{ 
+              background: '#fee2e2', 
+              color: '#ef4444', 
+              border: 'none', 
+              padding: '0.75rem 1.5rem', 
+              borderRadius: '50px', 
+              fontWeight: 600, 
+              fontSize: '0.9rem', 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = '#fecaca' }}
+            onMouseOut={(e) => { e.currentTarget.style.background = '#fee2e2' }}
+          >
+            Remove / Change
+          </button>
+        </div>
       </div>
     );
   }

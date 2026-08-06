@@ -370,12 +370,13 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
   if (isSubmitted) {
     return (
-      <div className="animate-slide-up text-center py-10">
-        <CheckCircle color="var(--success-color)" size={64} className="mx-auto mb-4" />
-        <h2>Form Submitted Successfully!</h2>
-        <p>Your PO data has been recorded in the FMS.</p>
+      <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem 1rem', textAlign: 'center' }}>
+        <CheckCircle color="var(--success-color)" size={72} style={{ marginBottom: '1rem' }} />
+        <h2 style={{ fontSize: '1.8rem', color: 'var(--text-heading)', marginBottom: '0.5rem' }}>Form Submitted Successfully!</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem' }}>Your PO data has been recorded in the FMS.</p>
         <button 
-          className="btn btn-primary mt-6"
+          className="btn btn-primary"
+          style={{ padding: '0.8rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px', width: 'auto' }}
           onClick={() => {
             setIsSubmitted(false);
             setHasExtracted(false);
