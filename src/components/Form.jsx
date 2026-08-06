@@ -387,6 +387,19 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check for duplicates on the frontend before submitting
+    if (mode === 'create') {
+      const isDuplicate = userPOs.some(po => 
+        po.poNumber?.toString().trim().toLowerCase() === formData.poNumber?.toString().trim().toLowerCase() && 
+        po.buyerName?.toString().trim().toLowerCase() === formData.buyerName?.toString().trim().toLowerCase()
+      );
+      
+      if (isDuplicate) {
+        toast.error("Duplicate Entry: You have already submitted this PO Number for this Buyer.");
+        return;
+      }
+    }
+
     const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
     if (!scriptUrl) {
       toast.error("Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.");
