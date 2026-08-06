@@ -738,6 +738,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
       </div>
       
     </form>
+    )}
     </>
   );
 }
