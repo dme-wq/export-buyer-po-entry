@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'RKD Export Purchase Order Entry',
-        short_name: 'RKD PO Entry',
+        name: 'Export Purchase Order',
+        short_name: 'Export Purchase Order',
         description: 'Purchase Order Entry App for RKD Export',
         theme_color: '#ffffff',
         icons: [
