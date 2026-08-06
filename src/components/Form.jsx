@@ -444,14 +444,19 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <MapPin size={14} color="var(--accent-color)"/> Delivery Address
           </label>
-          <input 
-            type="text" 
+          <textarea 
             name="deliveryAddress" 
             className="form-input" 
             value={formData.deliveryAddress} 
             onChange={handleChange} 
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = (e.target.scrollHeight) + 'px';
+            }}
             placeholder=""
             required
+            rows={1}
+            style={{ resize: 'none', overflow: 'hidden', minHeight: '46px' }}
           />
         </div>
       </div>
