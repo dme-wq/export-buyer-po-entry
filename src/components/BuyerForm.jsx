@@ -210,8 +210,26 @@ export default function BuyerForm({ authenticatedEmail }) {
       });
     };
 
-    if (!formData.buyerName.trim()) {
-      showErrorAlert('Required Field', 'Please enter Buyer Name');
+    // Validate all fields are filled
+    const requiredFields = {
+      buyerSource: 'Buyer Source',
+      commission1: 'Commission % (1)',
+      buyerSubSource: 'Buyer Sub Source',
+      commission2: 'Commission % (2)',
+      buyerName: 'Buyer Name',
+      buyerCountry: 'Buyer Country',
+      billingAddress: 'Billing Address',
+      paymentTerms1: 'Payment Terms 1',
+      paymentTerms2: 'Payment Terms 2',
+      buyerShortName: 'Buyer Short Name'
+    };
+
+    const emptyFields = Object.entries(requiredFields)
+      .filter(([key]) => !formData[key] || !String(formData[key]).trim())
+      .map(([, label]) => label);
+
+    if (emptyFields.length > 0) {
+      showErrorAlert('Missing Information', `Please fill out the following mandatory fields: ${emptyFields.join(', ')}`);
       return;
     }
 
