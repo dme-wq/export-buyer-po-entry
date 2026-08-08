@@ -468,17 +468,19 @@ export default function BuyerForm({ authenticatedEmail }) {
           />
         </div>
 
-        <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center' }}>
           <button 
             type="submit" 
-            className="btn-primary w-full"
+            className="btn btn-primary"
             disabled={isSubmitting}
             style={{ 
               display: 'flex', 
               justifyContent: 'center', 
-              alignItems: 'center',
-              padding: '1rem',
-              fontSize: '1.1rem'
+              gap: '8px',
+              padding: '1rem 2rem',
+              fontSize: '1.1rem',
+              width: '100%',
+              maxWidth: '300px'
             }}
           >
             {isSubmitting ? (
