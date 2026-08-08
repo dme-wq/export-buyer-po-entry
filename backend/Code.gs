@@ -164,10 +164,20 @@ function doPost(e) {
       
       const colData = dropDownSheet.getRange(1, colIndex, dropDownSheet.getLastRow() || 1, 1).getValues();
       let lastRow = 1;
+      const incomingValue = String(data.value || '').trim().toLowerCase();
+      
       for (let i = colData.length - 1; i >= 0; i--) {
-        if (colData[i][0] !== "" && colData[i][0] !== null) {
+        const cellValue = String(colData[i][0] || '').trim().toLowerCase();
+        
+        if (cellValue === incomingValue) {
+           return ContentService.createTextOutput(JSON.stringify({
+            status: 'error',
+            message: 'Duplicate Entry: This option already exists.'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        if (lastRow === 1 && colData[i][0] !== "" && colData[i][0] !== null) {
           lastRow = i + 1;
-          break;
         }
       }
       

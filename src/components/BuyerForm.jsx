@@ -213,8 +213,22 @@ export default function BuyerForm({ authenticatedEmail }) {
     if (newValue) {
       const cleanValue = newValue.trim();
       
+      const currentList = dropdownData[stateKey] || [];
+      
+      // Check for duplicate (case-insensitive)
+      const isDuplicate = currentList.some(item => String(item).trim().toLowerCase() === cleanValue.toLowerCase());
+      if (isDuplicate) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Duplicate Entry',
+          text: `"${cleanValue}" already exists in ${fieldLabel}.`,
+          confirmButtonColor: 'var(--accent-color)'
+        });
+        return;
+      }
+      
       // Optimistic update
-      const updatedList = [...(dropdownData[stateKey] || []), cleanValue];
+      const updatedList = [...currentList, cleanValue];
       setDropdownData(prev => ({ ...prev, [stateKey]: updatedList }));
       setFormData(prev => ({ ...prev, [fieldKey]: cleanValue }));
       
