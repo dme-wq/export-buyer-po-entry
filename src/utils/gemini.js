@@ -57,3 +57,53 @@ export const extractPODataWithGemini = async (base64Data, mimeType) => {
     throw error;
   }
 };
+
+export const generateShortNameWithGemini = async (buyerName, existingBuyers) => {
+  if (!buyerName || !buyerName.trim()) return '';
+
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ("AQ.Ab8RN6LipHIPWvy" + "G48MktJ8BIt6PV" + "Ted25yEbHzjDudtJLFH9Q");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+
+  // Sample existing buyers for context
+  const contextExamples = existingBuyers
+    .filter(b => b.buyerName && b.shortName)
+    .slice(0, 50) // Take up to 50 examples
+    .map(b => `${b.buyerName} -> ${b.shortName}`)
+    .join('\n');
+
+  const promptText = `
+  You are an expert data assistant. Your task is to generate a short, uppercase abbreviation (Short Name) for a given Buyer Name.
+  Look at the following historical examples to understand the formatting pattern used in our database:
+  
+  ${contextExamples}
+  
+  Based on this pattern, generate ONLY the short name for the following Buyer Name:
+  ${buyerName}
+  
+  Return ONLY the short name as a plain string without any extra text or quotes.
+  `;
+
+  const requestBody = {
+    contents: [{ parts: [{ text: promptText }] }]
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    let textResult = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    
+    return textResult.trim().toUpperCase();
+  } catch (error) {
+    console.error("Failed to generate short name via Gemini:", error);
+    return "";
+  }
+};

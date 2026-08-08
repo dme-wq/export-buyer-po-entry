@@ -3,6 +3,7 @@ import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipb
 import Swal from 'sweetalert2';
 import Select from 'react-select';
 import toast, { Toaster } from 'react-hot-toast';
+import { generateShortNameWithGemini } from '../utils/gemini';
 
 const customSelectStyles = (isInvalid, isEmpty, hasExtracted = false) => ({
   control: (base, state) => ({
@@ -97,6 +98,32 @@ export default function BuyerForm({ authenticatedEmail }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
+  const [isGeneratingShortName, setIsGeneratingShortName] = useState(false);
+
+  // Debounced AI Short Name Generator
+  useEffect(() => {
+    const buyerNameStr = formData.buyerName.trim();
+    if (!buyerNameStr) return;
+
+    // Prevent re-generating if user manually typed something different
+    if (formData.buyerShortName && !isGeneratingShortName) return;
+
+    const timeoutId = setTimeout(async () => {
+      setIsGeneratingShortName(true);
+      try {
+        const shortName = await generateShortNameWithGemini(buyerNameStr, dropdownData.buyers);
+        if (shortName) {
+          setFormData(prev => ({ ...prev, buyerShortName: shortName }));
+        }
+      } catch (err) {
+        console.error("AI short name generation failed", err);
+      } finally {
+        setIsGeneratingShortName(false);
+      }
+    }, 1200); // 1.2 second debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.buyerName, dropdownData.buyers]);
 
   useEffect(() => {
     // Current time formatting
@@ -464,7 +491,7 @@ export default function BuyerForm({ authenticatedEmail }) {
             className="form-input" 
             value={formData.buyerShortName} 
             onChange={handleChange}
-            placeholder="Enter short name (e.g. HN)"
+            placeholder={isGeneratingShortName ? "AI is generating..." : "Enter short name (e.g. HN)"}
           />
         </div>
 
