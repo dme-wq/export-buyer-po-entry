@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipboard, ExternalLink, Plus } from 'lucide-react';
+import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipboard, ExternalLink, Plus, ArrowLeft } from 'lucide-react';
 import Swal from 'sweetalert2';
 import Select from 'react-select';
 import toast, { Toaster } from 'react-hot-toast';
@@ -383,11 +383,16 @@ export default function BuyerForm({ authenticatedEmail }) {
     <div className="form-container">
       <Toaster position="top-right" />
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 style={{ color: 'var(--accent-color)', margin: 0, fontSize: '1.25rem', fontWeight: 'bold' }}>Add New Buyer</h2>
-        <button type="button" onClick={copyShareLink} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
-          <ExternalLink size={16} /> Share Link
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button type="button" onClick={() => window.location.hash = ''} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+            <ArrowLeft size={16} /> Go to PO Entry
+          </button>
+          <button type="button" onClick={copyShareLink} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+            <ExternalLink size={16} /> Share Link
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
