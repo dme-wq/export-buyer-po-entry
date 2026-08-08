@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2, List, Plus, Edit3 } from 'lucide-react';
 import FileUpload from './FileUpload';
-import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { Toaster, toast } from 'react-hot-toast';
 
 const displayFormatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -172,7 +173,28 @@ export default function Form({ authenticatedEmail, onLogout }) {
         console.error("Error fetching dropdowns in background:", err);
       }
     };
+    
     fetchDropdowns();
+
+    // Listen for custom event (same tab) and storage event (cross-tab)
+    const handleBuyerAdded = () => {
+      localStorage.removeItem('dropdownsCache');
+      fetchDropdowns();
+    };
+    
+    const handleStorageEvent = (e) => {
+      if (e.key === 'buyerAddedTrigger') {
+        handleBuyerAdded();
+      }
+    };
+
+    window.addEventListener('buyerAdded', handleBuyerAdded);
+    window.addEventListener('storage', handleStorageEvent);
+    
+    return () => {
+      window.removeEventListener('buyerAdded', handleBuyerAdded);
+      window.removeEventListener('storage', handleStorageEvent);
+    };
   }, []);
 
   // Update timestamp every second
@@ -697,9 +719,26 @@ export default function Form({ authenticatedEmail, onLogout }) {
         </div>
       )}
 
-      <h3 style={{ marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--text-heading)' }}>
-        <FileText size={22} color="var(--accent-color)" /> {mode === 'edit' ? 'Edit PO Details' : 'PO Details'}
-      </h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-heading)' }}>
+          <FileText size={22} color="var(--accent-color)" /> {mode === 'edit' ? 'Edit PO Details' : 'PO Details'}
+        </h3>
+        {mode === 'create' && (
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                const url = window.location.origin + window.location.pathname + '#/add-buyer';
+                window.open(url, '_blank');
+              }
+            }}
+            className="btn-secondary"
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <User size={16} /> Add New Buyer
+          </button>
+        )}
+      </div>
 
       <div className="form-grid">
         <div className="form-group">

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Form from './components/Form';
+import BuyerForm from './components/BuyerForm';
 import { Package, Lock, Clock, CheckCircle } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import PwaPrompt from './components/PwaPrompt';
 
-function App() {
-  const [userEmail, setUserEmail] = useState(null);
+function AppContent({ userEmail, setUserEmail }) {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
 
@@ -91,25 +92,36 @@ function App() {
               style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
             />
           </div>
-          <p style={{ margin: 0 }}>Export Buyer Purchase Order Entry</p>
+          <p style={{ margin: 0 }}>RKD Entry System</p>
         </div>
-        
-
       </header>
       
       <main className="container animate-slide-up delay-1">
         <div className="animated-border-wrapper">
           <div className="glass-panel">
-            <Form authenticatedEmail={userEmail} onLogout={() => {
-              localStorage.removeItem('userEmail');
-              setUserEmail(null);
-            }} />
+            <Routes>
+              <Route path="/" element={<Form authenticatedEmail={userEmail} onLogout={() => {
+                localStorage.removeItem('userEmail');
+                setUserEmail(null);
+              }} />} />
+              <Route path="/add-buyer" element={<BuyerForm authenticatedEmail={userEmail} />} />
+            </Routes>
           </div>
         </div>
       </main>
       
       <PwaPrompt />
     </>
+  );
+}
+
+function App() {
+  const [userEmail, setUserEmail] = useState(null);
+  
+  return (
+    <HashRouter>
+      <AppContent userEmail={userEmail} setUserEmail={setUserEmail} />
+    </HashRouter>
   );
 }
 

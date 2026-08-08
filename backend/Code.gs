@@ -85,7 +85,22 @@ function doGet(e) {
     // Remove duplicates for retailers
     const uniqueNames = [...new Set(retailerNames)];
     const uniqueCountries = [...new Set(retailerCountries)];
-    
+    // Get Buyer Sources (Column A)
+    const buyerSourcesRange = dropDownSheet.getRange('A2:A' + lrDrop);
+    const buyerSources = [...new Set(buyerSourcesRange.getValues().flat().filter(String))];
+
+    // Get Buyer Sub Sources (Column C)
+    const buyerSubSourcesRange = dropDownSheet.getRange('C2:C' + lrDrop);
+    const buyerSubSources = [...new Set(buyerSubSourcesRange.getValues().flat().filter(String))];
+
+    // Get Payment Terms 1 (Column K)
+    const paymentTerms1Range = dropDownSheet.getRange('K2:K' + lrDrop);
+    const paymentTerms1 = [...new Set(paymentTerms1Range.getValues().flat().filter(String))];
+
+    // Get Payment Terms 2 (Column L)
+    const paymentTerms2Range = dropDownSheet.getRange('L2:L' + lrDrop);
+    const paymentTerms2 = [...new Set(paymentTerms2Range.getValues().flat().filter(String))];
+
     // Get Buyer Data from 'Buyer Name' tab
     const buyerSheet = ss.getSheetByName('Buyer Name');
     let buyers = [];
@@ -105,7 +120,11 @@ function doGet(e) {
       data: {
         retailers: uniqueNames,
         countries: uniqueCountries,
-        buyers: buyers
+        buyers: buyers,
+        buyerSources: buyerSources,
+        buyerSubSources: buyerSubSources,
+        paymentTerms1: paymentTerms1,
+        paymentTerms2: paymentTerms2
       }
     })).setMimeType(ContentService.MimeType.JSON);
     
@@ -122,6 +141,39 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.openById(SHEET_ID);
+    
+    // Handle Buyer Name Form Submission
+    if (data.formType === 'addBuyer') {
+      const buyerResponsesSheet = ss.getSheetByName('Form Responses 3');
+      if (!buyerResponsesSheet) {
+        throw new Error("Form Responses 3 sheet not found");
+      }
+      
+      const timestamp = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), "dd-MMM-yyyy HH:mm:ss");
+      
+      const newBuyerRow = [
+        timestamp,
+        data.emailAddress || '',
+        data.buyerSource || '',
+        data.commission1 || '',
+        data.buyerSubSource || '',
+        data.commission2 || '',
+        data.buyerName || '',
+        data.buyerCountry || '',
+        data.billingAddress || '',
+        data.paymentTerms1 || '',
+        data.paymentTerms2 || '',
+        data.buyerShortName || ''
+      ];
+      
+      buyerResponsesSheet.appendRow(newBuyerRow);
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        message: 'Buyer added successfully'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
     
     // Append shortName to poNumber
