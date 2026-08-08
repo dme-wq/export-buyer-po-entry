@@ -6,6 +6,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import { extractPODataWithGemini } from '../utils/gemini';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import Swal from 'sweetalert2';
 
 const displayFormatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -379,21 +380,37 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Helper function for beautiful center alerts
+    const showErrorAlert = (title, text) => {
+      Swal.fire({
+        icon: 'error',
+        title: title,
+        text: text,
+        confirmButtonColor: 'var(--accent-color)',
+        customClass: {
+          popup: 'animated tada'
+        },
+        background: '#ffffff',
+        color: 'var(--text-heading)',
+        borderRadius: '16px'
+      });
+    };
+    
     // Validate Buyer Name exists in the dropdown list
     if (!dropdownData.buyers.some(b => b.buyerName === formData.buyerName)) {
-      toast.error("Invalid Buyer Name. Please select a valid buyer from the dropdown list.");
+      showErrorAlert('Invalid Buyer Name', 'Please select a valid buyer from the dropdown list.');
       return;
     }
 
     // Validate Retailer Name exists in the dropdown list
     if (!dropdownData.retailers.includes(formData.retailerName)) {
-      toast.error("Invalid Retailer Name. Please select a valid retailer from the dropdown list.");
+      showErrorAlert('Invalid Retailer Name', 'Please select a valid retailer from the dropdown list.');
       return;
     }
 
     // Validate Retailer Country exists in the dropdown list
     if (!dropdownData.countries.includes(formData.retailerCountry)) {
-      toast.error("Invalid Retailer Country. Please select a valid country from the dropdown list.");
+      showErrorAlert('Invalid Retailer Country', 'Please select a valid country from the dropdown list.');
       return;
     }
     
@@ -405,14 +422,14 @@ export default function Form({ authenticatedEmail, onLogout }) {
       );
       
       if (isDuplicate) {
-        toast.error("Duplicate Entry: You have already submitted this PO Number for this Buyer.");
+        showErrorAlert('Duplicate Entry', 'You have already submitted this PO Number for this Buyer.');
         return;
       }
     }
 
     const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
     if (!scriptUrl) {
-      toast.error("Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.");
+      showErrorAlert('Configuration Error', 'Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.');
       return;
     }
 
