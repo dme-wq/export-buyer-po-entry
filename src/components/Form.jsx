@@ -379,6 +379,24 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate Buyer Name exists in the dropdown list
+    if (!dropdownData.buyers.some(b => b.buyerName === formData.buyerName)) {
+      toast.error("Invalid Buyer Name. Please select a valid buyer from the dropdown list.");
+      return;
+    }
+
+    // Validate Retailer Name exists in the dropdown list
+    if (!dropdownData.retailers.includes(formData.retailerName)) {
+      toast.error("Invalid Retailer Name. Please select a valid retailer from the dropdown list.");
+      return;
+    }
+
+    // Validate Retailer Country exists in the dropdown list
+    if (!dropdownData.countries.includes(formData.retailerCountry)) {
+      toast.error("Invalid Retailer Country. Please select a valid country from the dropdown list.");
+      return;
+    }
+    
     // Check for duplicates on the frontend before submitting
     if (mode === 'create') {
       const isDuplicate = userPOs.some(po => 
@@ -416,6 +434,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
     const payload = {
       ...formData,
+      fileNumber: fileNumber,
       fileContent: fileBase64,
       fileName: fileName,
       mimeType: mimeType,
@@ -701,8 +720,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
             className="form-input" 
             value={fileNumber} 
             placeholder=""
-            readOnly
-            style={{ backgroundColor: '#e2e8f0', cursor: 'default' }}
+            disabled
+            style={{ backgroundColor: '#e2e8f0', cursor: 'not-allowed', color: 'var(--text-secondary)' }}
           />
         </div>
 
@@ -765,16 +784,21 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Building size={14} color="var(--accent-color)"/> Retailer Name
           </label>
-          <CreatableSelect
+          <Select
             name="retailerName"
-            value={formData.retailerName ? { value: formData.retailerName, label: formData.retailerName } : null}
+            value={
+              formData.retailerName 
+                ? (dropdownData.retailers.includes(formData.retailerName)
+                    ? { value: formData.retailerName, label: formData.retailerName }
+                    : { value: formData.retailerName, label: `${formData.retailerName} (Not in list)` })
+                : null
+            }
             onChange={(selectedOption) => {
               handleChange({ target: { name: 'retailerName', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.retailers.map(r => ({ value: r, label: r }))}
             styles={customSelectStyles(isRetailerNameInvalid, !formData.retailerName, hasExtracted)}
-            placeholder="Search or Add New..."
-            formatCreateLabel={(inputValue) => `Add new retailer "${inputValue}"`}
+            placeholder="Search Retailer Name..."
             isClearable
             isSearchable
             required
@@ -785,16 +809,21 @@ export default function Form({ authenticatedEmail, onLogout }) {
           <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Globe size={14} color="var(--accent-color)"/> Retailer Country
           </label>
-          <CreatableSelect
+          <Select
             name="retailerCountry"
-            value={formData.retailerCountry ? { value: formData.retailerCountry, label: formData.retailerCountry } : null}
+            value={
+              formData.retailerCountry
+                ? (dropdownData.countries.includes(formData.retailerCountry)
+                    ? { value: formData.retailerCountry, label: formData.retailerCountry }
+                    : { value: formData.retailerCountry, label: `${formData.retailerCountry} (Not in list)` })
+                : null
+            }
             onChange={(selectedOption) => {
               handleChange({ target: { name: 'retailerCountry', value: selectedOption ? selectedOption.value : '' } });
             }}
             options={dropdownData.countries.map(c => ({ value: c, label: c }))}
             styles={customSelectStyles(isRetailerCountryInvalid, !formData.retailerCountry, hasExtracted)}
-            placeholder="Search or Add New..."
-            formatCreateLabel={(inputValue) => `Add new country "${inputValue}"`}
+            placeholder="Search Retailer Country..."
             isClearable
             isSearchable
             required

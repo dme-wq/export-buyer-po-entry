@@ -42,7 +42,8 @@ function doGet(e) {
             rowIndex: i + 1,
             timestamp: row[0],
             email: row[1],
-            buyerName: row[2],
+            fileNumber: row[2],
+            buyerName: row[14],
             poDate: row[3] ? Utilities.formatDate(new Date(row[3]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
             poNumber: row[4],
             retailerName: row[5],
@@ -140,7 +141,7 @@ function doPost(e) {
     if (data.action !== 'update' && data.poNumber && data.buyerName) {
       const existingData = responsesSheet.getDataRange().getValues();
       for (let i = 1; i < existingData.length; i++) {
-        const existingBuyer = String(existingData[i][2] || '').trim().toLowerCase();
+        const existingBuyer = String(existingData[i][14] || '').trim().toLowerCase();
         const existingPo = String(existingData[i][4] || '').trim().toLowerCase();
         
         if (existingBuyer === String(data.buyerName).trim().toLowerCase() && 
@@ -153,19 +154,22 @@ function doPost(e) {
       }
     }
     
-    // Create new row array based on columns A to K
+    // Create new row array based on columns A to O
     // ColA: Timestamp
     // ColB: Email
-    // ColC: Buyer Name
+    // ColC: File Number
     // ColD: PO Date
     // ColE: Buyer PO Number
     // ColF: Retailer Name
     // ColG: Retailer Country
     // ColH: Ex-Factory Date
     // ColI: Delivery Address
-    // ColJ: PO Link (File URL if uploaded to Drive, for now taking URL or filename)
+    // ColJ: PO Link
     // ColK: Onboard Vessel Date
     // ColL: PO Amount
+    // ColM: Empty
+    // ColN: Empty
+    // ColO: Buyer Name
     
     let poLink = data.poLink || '';
     
@@ -186,7 +190,7 @@ function doPost(e) {
     const newRow = [
       data.timestamp || new Date(),
       data.email || '',
-      data.buyerName || '',
+      data.fileNumber || '',
       data.poDate || '',
       data.poNumber || '',
       data.retailerName || '',
@@ -195,7 +199,10 @@ function doPost(e) {
       data.deliveryAddress || '',
       poLink,
       data.onboardVesselDate || '',
-      data.poAmount || ''
+      data.poAmount || '',
+      '',
+      '',
+      data.buyerName || ''
     ];
     
     if (data.action === 'update' && data.rowIndex) {
@@ -203,7 +210,7 @@ function doPost(e) {
       if (data.originalTimestamp) {
         newRow[0] = data.originalTimestamp;
       }
-      responsesSheet.getRange(data.rowIndex, 1, 1, 12).setValues([newRow]);
+      responsesSheet.getRange(data.rowIndex, 1, 1, 15).setValues([newRow]);
     } else {
       responsesSheet.appendRow(newRow);
       
