@@ -137,8 +137,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
       }
     } catch (err) {
       console.error("Error fetching POs:", err);
-      // Only show error if we have no cached data, to not interrupt the user
-      if (!cached) toast.error("Failed to load your POs");
+      toast.error("Failed to load your POs. Check your Apps Script URL and permissions.");
     } finally {
       setIsLoadingPOs(false);
     }
