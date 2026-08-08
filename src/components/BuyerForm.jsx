@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipboard, ExternalLink } from 'lucide-react';
+import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipboard, ExternalLink, Plus } from 'lucide-react';
 import Swal from 'sweetalert2';
 import Select from 'react-select';
 import toast, { Toaster } from 'react-hot-toast';
@@ -194,6 +194,56 @@ export default function BuyerForm({ authenticatedEmail }) {
       .catch(() => toast.error('Failed to copy link'));
   };
 
+  const handleAddDropdownOption = async (fieldLabel, fieldKey, stateKey) => {
+    const { value: newValue } = await Swal.fire({
+      title: `Add New ${fieldLabel}`,
+      input: 'text',
+      inputLabel: `Enter new ${fieldLabel}`,
+      inputPlaceholder: `e.g. New ${fieldLabel}...`,
+      showCancelButton: true,
+      confirmButtonColor: 'var(--accent-color)',
+      confirmButtonText: 'Add',
+      inputValidator: (value) => {
+        if (!value || !value.trim()) {
+          return 'You need to write something!';
+        }
+      }
+    });
+
+    if (newValue) {
+      const cleanValue = newValue.trim();
+      
+      // Optimistic update
+      const updatedList = [...(dropdownData[stateKey] || []), cleanValue];
+      setDropdownData(prev => ({ ...prev, [stateKey]: updatedList }));
+      setFormData(prev => ({ ...prev, [fieldKey]: cleanValue }));
+      
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      if (!scriptUrl) return;
+
+      toast.promise(
+        fetch(scriptUrl, {
+          method: 'POST',
+          body: JSON.stringify({
+            formType: 'addDropdownOption',
+            field: fieldKey,
+            value: cleanValue
+          })
+        }).then(res => res.json()).then(res => {
+          if (res.status !== 'success') throw new Error(res.message);
+          // clear cache so next reload fetches fresh
+          localStorage.removeItem('buyerDropdownDataCache');
+          localStorage.removeItem('dropdownsCache');
+        }),
+        {
+          loading: `Saving new ${fieldLabel}...`,
+          success: `${fieldLabel} added successfully!`,
+          error: `Failed to save ${fieldLabel}`
+        }
+      );
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -358,7 +408,12 @@ export default function BuyerForm({ authenticatedEmail }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
           <div className="form-group">
-            <label className="form-label">Buyer Source</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', marginLeft: '0.5rem' }}>
+              <label className="form-label" style={{ margin: 0 }}>Buyer Source</label>
+              <button type="button" onClick={() => handleAddDropdownOption('Buyer Source', 'buyerSource', 'buyerSources')} className="text-accent" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent-color)' }}>
+                <Plus size={14} /> Add New
+              </button>
+            </div>
             <Select
               name="buyerSource"
               value={formData.buyerSource ? { value: formData.buyerSource, label: formData.buyerSource } : null}
@@ -388,7 +443,12 @@ export default function BuyerForm({ authenticatedEmail }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
           <div className="form-group">
-            <label className="form-label">Buyer Sub Source</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', marginLeft: '0.5rem' }}>
+              <label className="form-label" style={{ margin: 0 }}>Buyer Sub Source</label>
+              <button type="button" onClick={() => handleAddDropdownOption('Buyer Sub Source', 'buyerSubSource', 'buyerSubSources')} className="text-accent" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent-color)' }}>
+                <Plus size={14} /> Add New
+              </button>
+            </div>
             <Select
               name="buyerSubSource"
               value={formData.buyerSubSource ? { value: formData.buyerSubSource, label: formData.buyerSubSource } : null}
@@ -432,9 +492,14 @@ export default function BuyerForm({ authenticatedEmail }) {
         </div>
 
         <div className="form-group">
-          <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-            <Globe size={14} color="var(--accent-color)"/> Buyer Country
-          </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', marginLeft: '0.5rem' }}>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <Globe size={14} color="var(--accent-color)"/> Buyer Country
+              </label>
+              <button type="button" onClick={() => handleAddDropdownOption('Buyer Country', 'buyerCountry', 'countries')} className="text-accent" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent-color)' }}>
+                <Plus size={14} /> Add New
+              </button>
+            </div>
           <Select
             name="buyerCountry"
             value={formData.buyerCountry ? { value: formData.buyerCountry, label: formData.buyerCountry } : null}
@@ -465,9 +530,14 @@ export default function BuyerForm({ authenticatedEmail }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem' }}>
           <div className="form-group">
-            <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-              <FileText size={14} color="var(--accent-color)"/> Payment Terms 1
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', marginLeft: '0.5rem' }}>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <FileText size={14} color="var(--accent-color)"/> Payment Terms 1
+              </label>
+              <button type="button" onClick={() => handleAddDropdownOption('Payment Terms 1', 'paymentTerms1', 'paymentTerms1')} className="text-accent" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent-color)' }}>
+                <Plus size={14} /> Add New
+              </button>
+            </div>
             <Select
               name="paymentTerms1"
               value={formData.paymentTerms1 ? { value: formData.paymentTerms1, label: formData.paymentTerms1 } : null}
@@ -482,9 +552,14 @@ export default function BuyerForm({ authenticatedEmail }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-              <FileText size={14} color="var(--accent-color)"/> Payment Terms 2
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', marginLeft: '0.5rem' }}>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <FileText size={14} color="var(--accent-color)"/> Payment Terms 2
+              </label>
+              <button type="button" onClick={() => handleAddDropdownOption('Payment Terms 2', 'paymentTerms2', 'paymentTerms2')} className="text-accent" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent-color)' }}>
+                <Plus size={14} /> Add New
+              </button>
+            </div>
             <Select
               name="paymentTerms2"
               value={formData.paymentTerms2 ? { value: formData.paymentTerms2, label: formData.paymentTerms2 } : null}

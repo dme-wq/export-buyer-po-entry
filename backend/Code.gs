@@ -142,6 +142,43 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.openById(SHEET_ID);
     
+    // Handle Adding New Dropdown Option
+    if (data.formType === 'addDropdownOption') {
+      const dropDownSheet = ss.getSheetByName('Drop Downs');
+      if (!dropDownSheet) {
+        throw new Error("Drop Downs sheet not found");
+      }
+      
+      const fieldMap = {
+        'buyerSource': 1,      // Col A
+        'buyerSubSource': 3,   // Col C
+        'buyerCountry': 6,     // Col F
+        'paymentTerms1': 11,   // Col K
+        'paymentTerms2': 12    // Col L
+      };
+      
+      const colIndex = fieldMap[data.field];
+      if (!colIndex) {
+        throw new Error("Invalid field for dropdown addition");
+      }
+      
+      const colData = dropDownSheet.getRange(1, colIndex, dropDownSheet.getLastRow() || 1, 1).getValues();
+      let lastRow = 1;
+      for (let i = colData.length - 1; i >= 0; i--) {
+        if (colData[i][0] !== "" && colData[i][0] !== null) {
+          lastRow = i + 1;
+          break;
+        }
+      }
+      
+      dropDownSheet.getRange(lastRow + 1, colIndex).setValue(data.value);
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        message: 'Option added successfully'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // Handle Buyer Name Form Submission
     if (data.formType === 'addBuyer') {
       const buyerResponsesSheet = ss.getSheetByName('Form Responses 3');
