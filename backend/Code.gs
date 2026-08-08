@@ -149,6 +149,22 @@ function doPost(e) {
         throw new Error("Form Responses 3 sheet not found");
       }
       
+      // Check for duplicate Buyer Name
+      const buyerSheet = ss.getSheetByName('Buyer Name');
+      if (buyerSheet) {
+        const lrBuyer = Math.max(buyerSheet.getLastRow(), 2);
+        const buyerData = buyerSheet.getRange('G2:G' + lrBuyer).getValues();
+        const incomingName = String(data.buyerName || '').trim().toLowerCase();
+        
+        const isDuplicate = buyerData.some(row => String(row[0] || '').trim().toLowerCase() === incomingName);
+        if (isDuplicate) {
+          return ContentService.createTextOutput(JSON.stringify({
+            status: 'error',
+            message: 'Duplicate Buyer Name: This buyer already exists.'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      
       const timestamp = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), "dd-MMM-yyyy HH:mm:ss");
       
       const newBuyerRow = [

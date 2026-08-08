@@ -89,7 +89,8 @@ export default function BuyerForm({ authenticatedEmail }) {
     buyerSubSources: [],
     countries: [],
     paymentTerms1: [],
-    paymentTerms2: []
+    paymentTerms2: [],
+    buyers: []
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +136,8 @@ export default function BuyerForm({ authenticatedEmail }) {
             buyerSubSources: result.data.buyerSubSources || [],
             countries: result.data.countries || [],
             paymentTerms1: result.data.paymentTerms1 || [],
-            paymentTerms2: result.data.paymentTerms2 || []
+            paymentTerms2: result.data.paymentTerms2 || [],
+            buyers: result.data.buyers || []
           };
           setDropdownData(newData);
           localStorage.setItem(cacheKey, JSON.stringify(newData));
@@ -183,6 +185,15 @@ export default function BuyerForm({ authenticatedEmail }) {
 
     if (!formData.buyerName.trim()) {
       showErrorAlert('Required Field', 'Please enter Buyer Name');
+      return;
+    }
+
+    const isDuplicate = dropdownData.buyers.some(
+      b => b.buyerName.trim().toLowerCase() === formData.buyerName.trim().toLowerCase()
+    );
+
+    if (isDuplicate) {
+      showErrorAlert('Duplicate Buyer', 'This Buyer Name already exists in the system. Please enter a unique Buyer Name.');
       return;
     }
 
