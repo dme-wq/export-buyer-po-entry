@@ -37,13 +37,16 @@ function doGet(e) {
       
       for (let i = 1; i < data.length; i++) {
         const row = data[i];
-        if (row[1] === e.parameter.email) {
+        const emailInSheet = String(row[1] || '').trim().toLowerCase();
+        const emailRequested = String(e.parameter.email || '').trim().toLowerCase();
+        
+        if (emailInSheet === emailRequested) {
           userPOs.push({
             rowIndex: i + 1,
             timestamp: row[0],
             email: row[1],
             fileNumber: row[2],
-            buyerName: row[14],
+            buyerName: row[14] || row[2], // Fallback to column C for old entries
             poDate: row[3] ? Utilities.formatDate(new Date(row[3]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
             poNumber: row[4],
             retailerName: row[5],
@@ -141,7 +144,7 @@ function doPost(e) {
     if (data.action !== 'update' && data.poNumber && data.buyerName) {
       const existingData = responsesSheet.getDataRange().getValues();
       for (let i = 1; i < existingData.length; i++) {
-        const existingBuyer = String(existingData[i][14] || '').trim().toLowerCase();
+        const existingBuyer = String(existingData[i][14] || existingData[i][2] || '').trim().toLowerCase();
         const existingPo = String(existingData[i][4] || '').trim().toLowerCase();
         
         if (existingBuyer === String(data.buyerName).trim().toLowerCase() && 
