@@ -29,6 +29,42 @@ function doGet(e) {
   try {
     const ss = SpreadsheetApp.openById(SHEET_ID);
     
+    // Handle fetching a single PO by row index
+    if (e.parameter.action === 'getPOByRow' && e.parameter.rowIndex) {
+      const rowIndex = parseInt(e.parameter.rowIndex, 10);
+      const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
+      
+      if (rowIndex > 1 && rowIndex <= responsesSheet.getLastRow()) {
+        const row = responsesSheet.getRange(rowIndex, 1, 1, 15).getValues()[0];
+        const poData = {
+          rowIndex: rowIndex,
+          timestamp: row[0],
+          email: row[1],
+          fileNumber: row[2],
+          poDate: row[3] ? Utilities.formatDate(new Date(row[3]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+          poNumber: row[4],
+          retailerName: row[5],
+          retailerCountry: row[6],
+          exFactoryDate: row[7] ? Utilities.formatDate(new Date(row[7]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+          deliveryAddress: row[8],
+          poLink: row[9],
+          onboardVesselDate: row[10] ? Utilities.formatDate(new Date(row[10]), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd") : '',
+          poAmount: row[11],
+          buyerName: row[14] || row[2]
+        };
+        
+        return ContentService.createTextOutput(JSON.stringify({
+          status: 'success',
+          data: poData
+        })).setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify({
+          status: 'error',
+          message: 'Invalid row index'
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
     // Handle fetching POs for a specific user
     if (e.parameter.action === 'getPOs' && e.parameter.email) {
       const responsesSheet = ss.getSheetByName(RESPONSES_TAB);
@@ -328,9 +364,21 @@ function doPost(e) {
       if (data.originalTimestamp) {
         newRow[0] = data.originalTimestamp;
       }
+      
+      // Preserve Col M (S. No.) and Col N (Edit URL)
+      const existingRow = responsesSheet.getRange(data.rowIndex, 1, 1, 15).getValues()[0];
+      newRow[12] = existingRow[12];
+      newRow[13] = existingRow[13];
+      
       responsesSheet.getRange(data.rowIndex, 1, 1, 15).setValues([newRow]);
     } else {
       responsesSheet.appendRow(newRow);
+      
+      // Add S.No and Edit URL
+      const lastRow = responsesSheet.getLastRow();
+      responsesSheet.getRange(lastRow, 13).setValue(lastRow - 1);
+      const editUrl = data.baseUrl ? `${data.baseUrl}#/?editRow=${lastRow}` : '';
+      responsesSheet.getRange(lastRow, 14).setValue(editUrl);
       
       // WhatsApp Automation for New Entries
       try {

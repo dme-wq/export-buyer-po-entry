@@ -117,6 +117,51 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }
   }, [mode]);
 
+  useEffect(() => {
+    const hash = window.location.hash;
+    const match = hash.match(/editRow=(\d+)/);
+    if (match && match[1]) {
+      const rowIdx = parseInt(match[1], 10);
+      fetchPOByRow(rowIdx);
+    }
+  }, []);
+
+  const fetchPOByRow = async (rowIdx) => {
+    try {
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const response = await fetch(`${scriptUrl}?action=getPOByRow&rowIndex=${rowIdx}`);
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        const selectedPO = result.data;
+        setFormData({
+          timestamp: selectedPO.timestamp,
+          email: selectedPO.email,
+          buyerName: selectedPO.buyerName,
+          poDate: selectedPO.poDate,
+          poNumber: selectedPO.poNumber,
+          poAmount: selectedPO.poAmount,
+          retailerName: selectedPO.retailerName,
+          retailerCountry: selectedPO.retailerCountry,
+          exFactoryDate: selectedPO.exFactoryDate,
+          deliveryAddress: selectedPO.deliveryAddress,
+          onboardVesselDate: selectedPO.onboardVesselDate,
+          poLink: selectedPO.poLink
+        });
+        setOriginalTimestamp(selectedPO.timestamp);
+        setEditingRowIndex(selectedPO.rowIndex);
+        setMode('edit');
+        
+        // Remove editRow from URL to avoid loop on refresh
+        window.history.replaceState(null, '', window.location.pathname + '#/');
+      } else {
+        toast.error("Could not find the PO to edit.");
+      }
+    } catch (err) {
+      console.error("Error fetching PO by row:", err);
+      toast.error("Failed to load PO for editing.");
+    }
+  };
+
   const fetchUserPOs = async () => {
     const cacheKey = `userPOsCache_${authenticatedEmail}`;
     const cached = localStorage.getItem(cacheKey);
@@ -478,7 +523,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
       mimeType: mimeType,
       action: mode === 'edit' ? 'update' : 'create',
       rowIndex: editingRowIndex,
-      originalTimestamp: originalTimestamp
+      originalTimestamp: originalTimestamp,
+      baseUrl: window.location.origin + window.location.pathname
     };
 
     // INSTANTLY SHOW SUCCESS
