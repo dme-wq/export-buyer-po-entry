@@ -377,7 +377,8 @@ function doPost(e) {
       // Add S.No and Edit URL
       const lastRow = responsesSheet.getLastRow();
       responsesSheet.getRange(lastRow, 13).setValue(lastRow - 1);
-      const editUrl = data.baseUrl ? `${data.baseUrl}#/?editRow=${lastRow}` : '';
+      const baseUrl = data.baseUrl || 'https://export-buyer-po-entry.vercel.app';
+      const editUrl = `${baseUrl}/#/?editRow=${lastRow}`;
       responsesSheet.getRange(lastRow, 14).setValue(editUrl);
       
       // WhatsApp Automation for New Entries
