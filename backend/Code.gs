@@ -354,8 +354,8 @@ function doPost(e) {
       poLink,
       data.onboardVesselDate || '',
       data.poAmount || '',
-      '',
-      '',
+      null, // Col M - leave null for ArrayFormula
+      '', // Col N
       data.buyerName || ''
     ];
     
@@ -374,9 +374,8 @@ function doPost(e) {
     } else {
       responsesSheet.appendRow(newRow);
       
-      // Add S.No and Edit URL
+      // Add Edit URL
       const lastRow = responsesSheet.getLastRow();
-      responsesSheet.getRange(lastRow, 13).setValue(lastRow - 1);
       const baseUrl = data.baseUrl || 'https://export-buyer-po-entry.vercel.app';
       const editUrl = `${baseUrl}/#/?editRow=${lastRow}`;
       responsesSheet.getRange(lastRow, 14).setValue(editUrl);
