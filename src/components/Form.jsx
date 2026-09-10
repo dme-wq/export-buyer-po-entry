@@ -526,6 +526,10 @@ export default function Form({ authenticatedEmail, onLogout }) {
       originalTimestamp: originalTimestamp,
       baseUrl: window.location.origin + window.location.pathname
     };
+    
+    if (mode === 'create') {
+      delete payload.timestamp;
+    }
 
     // INSTANTLY SHOW SUCCESS
     toast.success("PO Submission started in background!");
@@ -962,7 +966,8 @@ export default function Form({ authenticatedEmail, onLogout }) {
             PO Amount
           </label>
           <input 
-            type="text" 
+            type="number"
+            step="any"
             name="poAmount" 
             className="form-input" 
             value={formData.poAmount} 
