@@ -342,7 +342,7 @@ function doPost(e) {
     }
     
     const newRow = [
-      data.timestamp || new Date(),
+      new Date(),
       data.email || '',
       data.fileNumber || '',
       data.poDate || '',
