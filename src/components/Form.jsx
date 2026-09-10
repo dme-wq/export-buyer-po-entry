@@ -375,8 +375,69 @@ export default function Form({ authenticatedEmail, onLogout }) {
       const mimeType = uploadedFile.type;
 
       try {
-        const data = await extractPODataWithGemini(base64String, mimeType);
+        const learnedRules = JSON.parse(localStorage.getItem('geminiLearnedRules') || '[]');
+        const result = await extractPODataWithGemini(base64String, mimeType, learnedRules);
         
+        let dataToApply = result.data || result; // Handle old format fallback
+        
+        if (result.status === 'confirmation_required' && result.confirmation?.candidates?.length > 0) {
+           const candidates = result.confirmation.candidates;
+           const optionsHtml = candidates.map((c, i) => 
+             `<div style="text-align: left; margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--accent-color)'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="document.getElementById('radio-${i}').click()">
+                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin: 0;">
+                  <input type="radio" name="candidate" id="radio-${i}" value="${i}" style="margin-top: 4px;" />
+                  <div>
+                    <strong style="color: var(--accent-color); font-size: 1.1em;">${c.value}</strong> 
+                    <span style="color: #64748b; font-size: 0.9em; font-weight: 500;">(Label: ${c.label || c.sourceLabel || 'Unknown'})</span>
+                    <div style="font-size: 0.85em; color: #475569; margin-top: 4px;">${c.reason || ''}</div>
+                  </div>
+                </label>
+              </div>`
+           ).join('');
+           
+           const { value: selectedIndex, isConfirmed } = await Swal.fire({
+             title: 'Clarification Needed 🤖',
+             html: `<p style="text-align:left; color: #334155; font-size: 0.95em; margin-bottom: 16px;">${result.confirmation.question}</p>
+                    <div style="max-height: 300px; overflow-y: auto;">${optionsHtml}</div>`,
+             showCancelButton: true,
+             confirmButtonText: 'Confirm Selection',
+             cancelButtonText: 'Skip',
+             confirmButtonColor: 'var(--accent-color)',
+             width: '500px',
+             preConfirm: () => {
+               const checked = document.querySelector('input[name="candidate"]:checked');
+               if (!checked) {
+                 Swal.showValidationMessage('Please select the correct date to proceed');
+               }
+               return checked ? checked.value : null;
+             }
+           });
+           
+           if (isConfirmed && selectedIndex !== null) {
+             const chosenCandidate = candidates[selectedIndex];
+             dataToApply[result.confirmation.field] = chosenCandidate.value;
+             
+             // Save learned rule
+             const newRule = {
+               retailer: dataToApply.retailerName || 'Unknown Retailer',
+               buyer: dataToApply.buyerName || 'Unknown Buyer',
+               field: result.confirmation.field,
+               selectedLabel: chosenCandidate.label || chosenCandidate.sourceLabel,
+               timestamp: new Date().toISOString()
+             };
+             
+             // Prevent duplicate rules for the exact same context
+             const isDuplicate = learnedRules.some(r => r.retailer === newRule.retailer && r.field === newRule.field && r.selectedLabel === newRule.selectedLabel);
+             if (!isDuplicate) {
+               learnedRules.push(newRule);
+               localStorage.setItem('geminiLearnedRules', JSON.stringify(learnedRules));
+               toast.success("Learned for next time!", { icon: '🧠' });
+             }
+           }
+        }
+        
+        const data = dataToApply;
+
         const extractedBuyer = data.buyerName || '';
         let invalidBuyer = false;
         
