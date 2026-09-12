@@ -1,10 +1,17 @@
-export const extractPODataWithGemini = async (base64Data, mimeType) => {
+export const extractPODataWithGemini = async (base64Data, mimeType, learnedRules = []) => {
   // Reconstructing key to avoid GitHub Secret Scanner blocking the push
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ("AQ.Ab8RN6LipHIPWvy" + "G48MktJ8BIt6PV" + "Ted25yEbHzjDudtJLFH9Q");
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
+  const rulesContext = learnedRules.length > 0 
+    ? `\nPAST USER CORRECTIONS (LEARNED RULES):\nThe following are manual corrections the user made to your past extractions. Pay very close attention to them.\n${JSON.stringify(learnedRules, null, 2)}\n\nIf the current document is from the same buyer/retailer, YOU MUST deduce why the user made the correction (e.g. they prefer ETA instead of ETD) and apply that logic here to get it right.\n` 
+    : '';
+
   const promptText = `
-  You are an expert OCR and data extraction AI. Extract the following Purchase Order details from the provided document into a clean JSON object:
+  You are an advanced Purchase Order (PO) Document Intelligence and Data Extraction Agent.
+  Your job is NOT simple OCR. You must intelligently understand the complete Purchase Order document, identify its structure, and understand the business meaning of every field.
+
+  Extract the following Purchase Order details from the provided document into a clean JSON object:
   - buyerName (string)
   - poDate (string, format YYYY-MM-DD)
   - poNumber (string)
@@ -14,6 +21,12 @@ export const extractPODataWithGemini = async (base64Data, mimeType) => {
   - exFactoryDate (string, format YYYY-MM-DD)
   - onboardVesselDate (string, format YYYY-MM-DD)
   - poAmount (string, the total order value or amount)
+  
+  ==================================================
+  CRITICAL RULE — DATES
+  ==================================================
+  Ex-Factory Date is often related to the expected arrival date (ETA) relevant to the application's business process, NOT automatically ETD. Do not blindly assume Ex-Factory = ETD. Look at the whole document.
+  ${rulesContext}
   
   Return ONLY a valid JSON object matching these keys. If a field is not found, leave it as an empty string "". Do not include markdown tags like \`\`\`json.
   `;

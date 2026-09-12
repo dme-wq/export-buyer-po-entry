@@ -360,13 +360,11 @@ function doPost(e) {
     ];
     
     if (data.action === 'update' && data.rowIndex) {
-      // For updates, we keep the original timestamp if not provided new
-      if (data.originalTimestamp) {
-        newRow[0] = data.originalTimestamp;
-      }
-      
-      // Preserve Col M (S. No.) and Col N (Edit URL)
       const existingRow = responsesSheet.getRange(data.rowIndex, 1, 1, 15).getValues()[0];
+      
+      // Preserve the original timestamp from the sheet (Col A)
+      newRow[0] = existingRow[0];
+      // Preserve Col M (S. No.) and Col N (Edit URL)
       newRow[12] = existingRow[12];
       newRow[13] = existingRow[13];
       

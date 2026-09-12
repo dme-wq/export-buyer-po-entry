@@ -89,6 +89,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
   const [file, setFile] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [hasExtracted, setHasExtracted] = useState(false);
+  const [originalExtractedData, setOriginalExtractedData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   
@@ -375,7 +376,11 @@ export default function Form({ authenticatedEmail, onLogout }) {
       const mimeType = uploadedFile.type;
 
       try {
-        const data = await extractPODataWithGemini(base64String, mimeType);
+        const learnedRules = JSON.parse(localStorage.getItem('geminiLearnedRules') || '[]');
+        const data = await extractPODataWithGemini(base64String, mimeType, learnedRules);
+        
+        // Save the extracted data so we can compare it later upon submission
+        setOriginalExtractedData(data);
         
         const extractedBuyer = data.buyerName || '';
         let invalidBuyer = false;
@@ -498,6 +503,53 @@ export default function Form({ authenticatedEmail, onLogout }) {
       showErrorAlert('Configuration Error', 'Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.');
       return;
     }
+
+    // --- SILENT LEARNING MECHANISM ---
+    if (originalExtractedData) {
+      const learnedRules = JSON.parse(localStorage.getItem('geminiLearnedRules') || '[]');
+      let ruleAdded = false;
+      
+      const checkAndLearn = (field) => {
+        const originalVal = (originalExtractedData[field] || '').toString().trim();
+        const finalVal = (formData[field] || '').toString().trim();
+        
+        // If AI originally extracted something, but user submitted something else
+        if (originalVal && finalVal && originalVal !== finalVal) {
+          const newRule = {
+            retailer: formData.retailerName || 'Unknown Retailer',
+            buyer: formData.buyerName || 'Unknown Buyer',
+            field: field,
+            originalAIValue: originalVal,
+            userCorrectedValue: finalVal,
+            timestamp: new Date().toISOString()
+          };
+          
+          // Check for duplicate rule
+          const isDuplicate = learnedRules.some(r => 
+            r.retailer === newRule.retailer && 
+            r.field === newRule.field && 
+            r.userCorrectedValue === newRule.userCorrectedValue
+          );
+          
+          if (!isDuplicate) {
+            learnedRules.push(newRule);
+            ruleAdded = true;
+          }
+        }
+      };
+
+      // Check fields for manual corrections
+      checkAndLearn('exFactoryDate');
+      checkAndLearn('onboardVesselDate');
+      checkAndLearn('poDate');
+      checkAndLearn('poAmount');
+      checkAndLearn('poNumber');
+
+      if (ruleAdded) {
+        localStorage.setItem('geminiLearnedRules', JSON.stringify(learnedRules));
+      }
+    }
+    // ---------------------------------
 
     setIsSubmitting(true);
     
