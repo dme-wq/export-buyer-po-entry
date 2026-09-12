@@ -92,7 +92,6 @@ function AppContent({ userEmail, setUserEmail }) {
               style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
             />
           </div>
-          <p style={{ margin: 0 }}>RKD Entry System</p>
         </div>
       </header>
       
