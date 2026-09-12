@@ -119,10 +119,13 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }
   }, [mode]);
 
+  const hasFetchedEdit = React.useRef(false);
+
   useEffect(() => {
     const hash = window.location.hash;
     const match = hash.match(/editRow=(\d+)/);
-    if (match && match[1]) {
+    if (match && match[1] && !hasFetchedEdit.current) {
+      hasFetchedEdit.current = true;
       const rowIdx = parseInt(match[1], 10);
       fetchPOByRow(rowIdx);
     }
