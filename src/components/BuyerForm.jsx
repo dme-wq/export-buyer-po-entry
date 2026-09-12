@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, DollarSign, MapPin, Building, Globe, CheckCircle, FileText, Clipboard, ExternalLink, Plus, ArrowLeft } from 'lucide-react';
+import { GOOGLE_SCRIPT_URL } from '../config';
 import Swal from 'sweetalert2';
 import Select from 'react-select';
 import toast, { Toaster } from 'react-hot-toast';
@@ -151,7 +152,7 @@ export default function BuyerForm({ authenticatedEmail }) {
       }
 
       try {
-        const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+        const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
         if (!scriptUrl) return;
         
         const response = await fetch(`${scriptUrl}?action=getDropdowns`);
@@ -232,7 +233,7 @@ export default function BuyerForm({ authenticatedEmail }) {
       setDropdownData(prev => ({ ...prev, [stateKey]: updatedList }));
       setFormData(prev => ({ ...prev, [fieldKey]: cleanValue }));
       
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       if (!scriptUrl) return;
 
       toast.promise(
@@ -309,7 +310,7 @@ export default function BuyerForm({ authenticatedEmail }) {
     setIsSubmitting(true);
 
     try {
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       
       const payload = {
         formType: 'addBuyer',

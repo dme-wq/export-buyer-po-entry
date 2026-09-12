@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { UploadCloud, CheckCircle, Search, Send, Clock, FileText, User, Calendar, FileDigit, MapPin, Building, Globe, Truck, Ship, Box, DollarSign, Loader2, List, Plus, Edit3 } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { extractPODataWithGemini } from '../utils/gemini';
+import { GOOGLE_SCRIPT_URL } from '../config';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import Swal from 'sweetalert2';
@@ -129,7 +130,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
 
   const fetchPOByRow = async (rowIdx) => {
     try {
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       const response = await fetch(`${scriptUrl}?action=getPOByRow&rowIndex=${rowIdx}`);
       const result = await response.json();
       if (result.status === 'success' && result.data) {
@@ -175,7 +176,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
     }
     
     try {
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       const response = await fetch(`${scriptUrl}?action=getPOs&email=${encodeURIComponent(authenticatedEmail)}`);
       const result = await response.json();
       if (result.status === 'success') {
@@ -199,7 +200,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
         setDropdownData(JSON.parse(cached));
       }
 
-      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       if (!scriptUrl) return;
       
       // 2. Fetch fresh data in the background
@@ -498,7 +499,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
       }
     }
 
-    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
     if (!scriptUrl) {
       showErrorAlert('Configuration Error', 'Google Apps Script URL is not configured. Please set VITE_GOOGLE_SCRIPT_URL.');
       return;
