@@ -132,6 +132,7 @@ export default function Form({ authenticatedEmail, onLogout }) {
   }, []);
 
   const fetchPOByRow = async (rowIdx) => {
+    let loadedSuccessfully = false;
     try {
       const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL;
       const response = await fetch(`${scriptUrl}?action=getPOByRow&rowIndex=${rowIdx}`);
@@ -156,14 +157,22 @@ export default function Form({ authenticatedEmail, onLogout }) {
         setEditingRowIndex(selectedPO.rowIndex);
         setMode('edit');
         
-        // Remove editRow from URL to avoid loop on refresh
-        window.history.replaceState(null, '', window.location.pathname + '#/');
+        loadedSuccessfully = true;
+
+        try {
+          // Remove editRow from URL to avoid loop on refresh
+          window.history.replaceState(null, '', window.location.pathname + '#/');
+        } catch (e) {
+          console.warn("Could not replace history state:", e);
+        }
       } else {
         toast.error("Could not find the PO to edit.");
       }
     } catch (err) {
       console.error("Error fetching PO by row:", err);
-      toast.error("Failed to load PO for editing.");
+      if (!loadedSuccessfully) {
+        toast.error("Failed to load PO for editing.");
+      }
     }
   };
 
